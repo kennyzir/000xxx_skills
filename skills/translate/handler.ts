@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { authMiddleware } from '../lib/auth';
-import { validateInput } from '../lib/validation';
-import { successResponse, errorResponse } from '../lib/response';
+import { authMiddleware } from '../../lib/auth';
+import { validateInput } from '../../lib/validation';
+import { successResponse, errorResponse } from '../../lib/response';
 
 // Simple translation dictionary for demo
 // In production, use Google Translate API or similar
@@ -10,27 +10,28 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     'es': 'hola',
     'fr': 'bonjour',
     'de': 'hallo',
-    'zh': '你好',
-    'ja': 'こんにちは',
-    'ko': '안녕하세요'
+    'zh': '\u4f60\u597d',
+    'ja': '\u3053\u3093\u306b\u3061\u306f',
+    'ko': '\uc548\ub155\ud558\uc138\uc694'
   },
   'goodbye': {
-    'es': 'adiós',
+    'es': 'adi\u00f3s',
     'fr': 'au revoir',
     'de': 'auf wiedersehen',
-    'zh': '再见',
-    'ja': 'さようなら',
-    'ko': '안녕히 가세요'
+    'zh': '\u518d\u89c1',
+    'ja': '\u3055\u3088\u3046\u306a\u3089',
+    'ko': '\uc548\ub155\ud788 \uac00\uc138\uc694'
   },
   'thank you': {
     'es': 'gracias',
     'fr': 'merci',
     'de': 'danke',
-    'zh': '谢谢',
-    'ja': 'ありがとう',
-    'ko': '감사합니다'
+    'zh': '\u8c22\u8c22',
+    'ja': '\u3042\u308a\u304c\u3068\u3046',
+    'ko': '\uac10\uc0ac\ud569\ub2c8\ub2e4'
   }
 };
+
 
 async function handler(req: VercelRequest, res: VercelResponse) {
   // Validate input
@@ -79,8 +80,8 @@ async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error: any) {
     console.error('Translation error:', error);
     return errorResponse(
-      res, 
-      'Failed to translate text', 
+      res,
+      'Failed to translate text',
       500,
       error.message
     );

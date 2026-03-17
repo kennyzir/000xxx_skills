@@ -1,8 +1,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 const Sentiment = require('sentiment');
-import { authMiddleware } from '../lib/auth';
-import { validateInput } from '../lib/validation';
-import { successResponse, errorResponse } from '../lib/response';
+import { authMiddleware } from '../../lib/auth';
+import { validateInput } from '../../lib/validation';
+import { successResponse, errorResponse } from '../../lib/response';
 
 const sentiment = new Sentiment();
 

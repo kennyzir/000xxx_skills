@@ -1,3 +1,4 @@
 {
-  "regions": ["iad1"]
+  "regions": ["iad1"],
+  "buildCommand": "echo 'skip tsc — Vercel compiles api/ functions natively'"
 }

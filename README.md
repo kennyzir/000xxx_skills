@@ -37,6 +37,11 @@ This repo contains production-ready **AI skill APIs** — small, focused microse
 | 📄 PDF Parser | `/api/parse-pdf` | Extract text and metadata from PDF documents | ✅ Production |
 | 🌐 Translation | `/api/translate` | Translate text between 6+ languages | 🔧 Demo |
 | 🎨 Image Generator | `/api/generate-image` | Generate images from text prompts | 🔧 Placeholder |
+| 📬 AgentMail | `/api/agentmail` | API-first email platform for AI agents | ✅ Production |
+| 🧬 Capability Evolver | `/api/capability-evolver` | Meta-skill for agent self-improvement via EvoMap Hub | ✅ Production |
+| 🧠 Self-Improving Agent | `/api/self-improving-agent` | Capture learnings, errors, corrections for continuous improvement | ✅ Production |
+| 📦 Skills Archive | `/api/skills` | Archive of all ClawHub skills | 🔧 Placeholder |
+| 🔎 Tavily Search | `/api/tavily-search` | LLM-optimized web search with AI answer summaries | ✅ Production |
 
 ## Quick Start
 
@@ -267,7 +272,12 @@ Deploy → your skill is live at `/api/my-skill`.
 │   ├── sentiment.ts        # Sentiment analysis
 │   ├── parse-pdf.ts        # PDF text extraction
 │   ├── translate.ts        # Translation
-│   └── generate-image.ts   # Image generation
+│   ├── generate-image.ts   # Image generation
+│   ├── agentmail.ts        # AI agent email platform (API wrapper)
+│   ├── capability-evolver.ts # Agent self-improvement via EvoMap
+│   ├── self-improving-agent.ts # Learning & correction capture
+│   ├── skills.ts           # ClawHub skills archive
+│   └── tavily-search.ts   # LLM-optimized web search (Tavily)
 ├── lib/                    # Shared utilities (use these!)
 │   ├── auth.ts             # Bearer token auth middleware
 │   ├── validation.ts       # Input schema validation

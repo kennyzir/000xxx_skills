@@ -1,0 +1,73 @@
+---
+name: claw0x-awesome-openclaw-skills
+description: >
+  Search and discover from 5,400+ curated OpenClaw skills via the Claw0x API.
+  Use when the user asks to find skills, browse the skill catalog, search for
+  agent capabilities, list skill categories, or discover what tools are available
+  in the OpenClaw ecosystem. Filter by category, keyword, or use case.
+allowed-tools: Bash(curl *)
+metadata:
+  requires:
+    env:
+      - CLAW0X_API_KEY
+---
+
+# Awesome OpenClaw Skills (Discovery)
+
+Search and browse a curated catalog of OpenClaw skills. Find the right skill for any agent task.
+
+## Prerequisites
+
+Requires a Claw0x API key. Sign up at [claw0x.com](https://claw0x.com) and create a key in your dashboard. Set it as an environment variable:
+
+```bash
+export CLAW0X_API_KEY="your-api-key-here"
+```
+
+## When to use
+
+- User says "find a skill for", "what skills are available", "browse skills", "list categories"
+- Agent needs to discover which skill to use for a specific task
+- User wants to explore the OpenClaw ecosystem
+
+## API call
+
+```bash
+curl -s -X POST https://claw0x.com/v1/call \
+  -H "Authorization: Bearer $CLAW0X_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "skill": "awesome-openclaw-skills",
+    "input": {
+      "query": "$ARGUMENTS"
+    }
+  }'
+```
+
+## Input
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `input.query` | string | no | Keyword search (name, description, tags) |
+| `input.category` | string | no | Filter by category name |
+| `input.limit` | number | no | Max results (default 20, max 100) |
+| `input.action` | string | no | `"categories"` to list all categories instead of searching |
+
+## Output (search mode)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `skills` | array | Matching skills with name, slug, description, category, tags |
+| `total` | number | Number of results |
+| `catalog_size` | number | Total skills in catalog |
+
+## Output (categories mode)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `categories` | array | Category names with skill counts |
+| `total_skills` | number | Total skills in catalog |
+
+## Pricing
+
+Pay-per-successful-call only. Failed calls and 5xx errors are free.

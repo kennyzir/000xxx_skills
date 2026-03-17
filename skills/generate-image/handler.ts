@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { authMiddleware } from '../lib/auth';
-import { validateInput } from '../lib/validation';
-import { successResponse, errorResponse } from '../lib/response';
+import { authMiddleware } from '../../lib/auth';
+import { validateInput } from '../../lib/validation';
+import { successResponse, errorResponse } from '../../lib/response';
 
 async function handler(req: VercelRequest, res: VercelResponse) {
   // Validate input
