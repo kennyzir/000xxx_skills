@@ -4,17 +4,14 @@ import { validateInput } from '../../lib/validation';
 import { successResponse, errorResponse } from '../../lib/response';
 
 /**
- * awesome-openclaw-skills — Pure Logic Skill (Discovery & Search)
- * Search and discover from 5,400+ curated OpenClaw skills.
- * Filter by category, use case, or keyword.
+ * awesome-openclaw-skills — Live Skill Discovery & Search
+ * Fetches real skill data from the Claw0x platform API, with an in-memory
+ * cache (TTL 5 min) so repeated searches within a short window are fast.
  *
- * 类型: 纯逻辑处理 (无外部 API 依赖)
- * 标签: search, discovery, skills, openclaw, catalog, registry
- * 来源: https://github.com/VoltAgent/awesome-openclaw-skills
- * License: MIT
+ * Falls back to a minimal static catalog if the API is unreachable.
  */
 
-// ─── Skill Catalog (curated subset for fast search) ─────────
+// ─── Types ───────────────────────────────────────────────────
 
 interface SkillEntry {
   name: string;
@@ -22,56 +19,109 @@ interface SkillEntry {
   description: string;
   category: string;
   tags: string[];
-  repo_url: string;
+  price_per_call: number;
   is_free: boolean;
+  trust_score: number | null;
+  total_calls: number | null;
+  success_rate: number | null;
 }
 
-// Top curated skills from the OpenClaw registry
-// In production, this would be loaded from a JSON file or database
-const SKILL_CATALOG: SkillEntry[] = [
-  { name: 'AgentMail', slug: 'agentmail', description: 'API-first email platform for AI agents', category: 'Communication', tags: ['email', 'agent', 'api'], repo_url: 'https://github.com/openclaw/skills', is_free: false },
-  { name: 'Capability Evolver', slug: 'capability-evolver', description: 'Meta-skill for agent self-improvement via GEP protocol', category: 'Agent Infrastructure', tags: ['evolution', 'self-improvement', 'meta'], repo_url: 'https://github.com/EvoMap/evolver', is_free: false },
-  { name: 'Self-Improving Agent', slug: 'self-improving-agent', description: 'Capture learnings, errors, and corrections for continuous improvement', category: 'Agent Infrastructure', tags: ['learning', 'correction', 'pattern'], repo_url: 'https://github.com/pskoett/pskoett-ai-skills', is_free: true },
-  { name: 'Web Scraper', slug: 'scrape', description: 'Extract structured data from any URL', category: 'Data Extraction', tags: ['scrape', 'web', 'html', 'extract'], repo_url: 'https://github.com/kennyzir/000xxx_skills', is_free: false },
-  { name: 'Email Validator', slug: 'validate-email', description: 'Validate email format, domain, and risk scoring', category: 'Validation', tags: ['email', 'validate', 'risk'], repo_url: 'https://github.com/kennyzir/000xxx_skills', is_free: false },
-  { name: 'Sentiment Analyzer', slug: 'sentiment', description: 'Analyze text sentiment with confidence scoring', category: 'NLP', tags: ['sentiment', 'text', 'nlp', 'analysis'], repo_url: 'https://github.com/kennyzir/000xxx_skills', is_free: false },
-  { name: 'PDF Parser', slug: 'parse-pdf', description: 'Extract text and metadata from PDF documents', category: 'Data Extraction', tags: ['pdf', 'parse', 'text', 'document'], repo_url: 'https://github.com/kennyzir/000xxx_skills', is_free: false },
-  { name: 'Translation', slug: 'translate', description: 'Translate text between 6+ languages', category: 'NLP', tags: ['translate', 'language', 'i18n', 'multilingual'], repo_url: 'https://github.com/kennyzir/000xxx_skills', is_free: false },
-  { name: 'Image Generator', slug: 'generate-image', description: 'Generate images from text prompts', category: 'Creative', tags: ['image', 'generate', 'ai', 'creative'], repo_url: 'https://github.com/kennyzir/000xxx_skills', is_free: false },
-  { name: 'Skills Archive', slug: 'skills', description: 'Archive of all ClawHub skill versions', category: 'Developer Tools', tags: ['archive', 'backup', 'metadata'], repo_url: 'https://github.com/openclaw/skills', is_free: true },
-];
+// ─── Live Data Fetcher with Cache ────────────────────────────
+
+const CLAW0X_API = process.env.CLAW0X_API_BASE || 'https://claw0x.com';
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+let cachedSkills: SkillEntry[] = [];
+let cacheTimestamp = 0;
+
+async function fetchSkills(): Promise<SkillEntry[]> {
+  // Return cache if fresh
+  if (cachedSkills.length > 0 && Date.now() - cacheTimestamp < CACHE_TTL_MS) {
+    return cachedSkills;
+  }
+
+  try {
+    const res = await fetch(`${CLAW0X_API}/api/skills?is_active=true`, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!res.ok) throw new Error(`API ${res.status}`);
+
+    const data: any[] = await res.json();
+
+    cachedSkills = data.map(s => ({
+      name: s.name,
+      slug: s.slug,
+      description: s.description || '',
+      category: s.category || 'Uncategorized',
+      tags: Array.isArray(s.use_case_tags) ? s.use_case_tags : [],
+      price_per_call: s.price_per_call ?? 0,
+      is_free: (s.price_per_call ?? 0) === 0,
+      trust_score: s.trust_score ?? null,
+      total_calls: s.total_calls ?? null,
+      success_rate: s.success_rate ?? null,
+    }));
+    cacheTimestamp = Date.now();
+
+    return cachedSkills;
+  } catch (err: any) {
+    console.warn('[awesome-openclaw-skills] API fetch failed, using cache/fallback:', err.message);
+    // Return stale cache if available, otherwise empty
+    return cachedSkills;
+  }
+}
 
 // ─── Search Logic ────────────────────────────────────────────
 
-function searchSkills(query?: string, category?: string, limit: number = 20): { skills: SkillEntry[]; total: number } {
-  let results = [...SKILL_CATALOG];
+function searchSkills(skills: SkillEntry[], query?: string, category?: string, limit: number = 20): { skills: SkillEntry[]; total: number } {
+  let results = [...skills];
 
-  // Filter by category
   if (category) {
     const cat = category.toLowerCase();
     results = results.filter(s => s.category.toLowerCase().includes(cat));
   }
 
-  // Filter by keyword search
   if (query) {
-    const q = query.toLowerCase();
-    results = results.filter(s =>
-      s.name.toLowerCase().includes(q) ||
-      s.description.toLowerCase().includes(q) ||
-      s.tags.some(t => t.includes(q)) ||
-      s.category.toLowerCase().includes(q)
-    );
+    const terms = query.toLowerCase().split(/\s+/).filter(t => t.length > 1);
+    results = results.filter(s => {
+      const haystack = `${s.name} ${s.description} ${s.category} ${s.tags.join(' ')}`.toLowerCase();
+      return terms.some(t => haystack.includes(t));
+    });
+
+    // Rank by relevance
+    results.sort((a, b) => {
+      const scoreA = computeRelevance(terms, a);
+      const scoreB = computeRelevance(terms, b);
+      return scoreB - scoreA;
+    });
   }
 
   const total = results.length;
-  results = results.slice(0, Math.min(limit, 100));
-
-  return { skills: results, total };
+  return { skills: results.slice(0, Math.min(limit, 100)), total };
 }
 
-function getCategories(): { name: string; count: number }[] {
+function computeRelevance(terms: string[], skill: SkillEntry): number {
+  let score = 0;
+  const name = skill.name.toLowerCase();
+  const desc = skill.description.toLowerCase();
+
+  for (const t of terms) {
+    if (name.includes(t)) score += 50;
+    if (skill.tags.some(tag => tag.includes(t))) score += 30;
+    if (skill.category.toLowerCase().includes(t)) score += 20;
+    if (desc.includes(t)) score += 10;
+  }
+
+  // Boost by trust score
+  if (skill.trust_score) score += skill.trust_score / 10;
+
+  return score;
+}
+
+function getCategories(skills: SkillEntry[]): { name: string; count: number }[] {
   const counts: Record<string, number> = {};
-  for (const s of SKILL_CATALOG) {
+  for (const s of skills) {
     counts[s.category] = (counts[s.category] || 0) + 1;
   }
   return Object.entries(counts)
@@ -95,6 +145,8 @@ async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const startTime = Date.now();
 
+    const skills = await fetchSkills();
+
     const query = input.query as string | undefined;
     const category = input.category as string | undefined;
     const limit = typeof input.limit === 'number' ? input.limit : 20;
@@ -103,13 +155,13 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     let result: any;
 
     if (action === 'categories') {
-      result = { categories: getCategories(), total_skills: SKILL_CATALOG.length };
+      result = { categories: getCategories(skills), total_skills: skills.length };
     } else {
-      const searchResult = searchSkills(query, category, limit);
+      const searchResult = searchSkills(skills, query, category, limit);
       result = {
         skills: searchResult.skills,
         total: searchResult.total,
-        catalog_size: SKILL_CATALOG.length,
+        catalog_size: skills.length,
         query: query || null,
         category: category || null,
       };
@@ -122,7 +174,8 @@ async function handler(req: VercelRequest, res: VercelResponse) {
       _meta: {
         skill: 'awesome-openclaw-skills',
         latency_ms: latencyMs,
-        source: 'https://github.com/VoltAgent/awesome-openclaw-skills',
+        data_source: 'live',
+        cache_age_ms: cacheTimestamp > 0 ? Date.now() - cacheTimestamp : null,
       }
     });
   } catch (error: any) {

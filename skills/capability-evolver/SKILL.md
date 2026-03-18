@@ -15,7 +15,58 @@ metadata:
 
 # Capability Evolver
 
-Analyze agent runtime logs, detect patterns, compute health scores, and generate structured improvement proposals. Pure logic — no external API dependency.
+Analyze agent runtime logs, detect patterns, compute health scores, and generate structured improvement proposals. Pure logic — no external AI dependency.
+
+## How It Works — Under the Hood
+
+Capability Evolver is a deterministic analysis engine that processes structured log data and produces actionable diagnostics. No LLM is involved — the analysis is rule-based, which means results are reproducible and fast.
+
+### Analysis Engine
+
+The core engine processes log entries through several analysis passes:
+
+1. **Pattern detection** — logs are grouped by `context` (file/module) and `level` (error/warn/info/debug). The engine looks for:
+   - **Repeated errors** — the same error message appearing multiple times indicates a systemic issue, not a transient failure
+   - **Error cascades** — errors in module A followed by errors in module B within a short time window suggest a dependency chain failure
+   - **Regression signals** — errors that appear after a period of clean logs suggest a recent change broke something
+   - **Inefficiency patterns** — excessive warn-level logs or repeated retries indicate performance issues
+
+2. **Health scoring** — a system health score (0–100) is computed based on:
+   - Error rate (errors / total logs)
+   - Error diversity (unique error messages / total errors)
+   - Warn-to-error ratio
+   - Time distribution (clustered errors score worse than spread-out errors)
+
+3. **Recommendation generation** — based on detected patterns, the engine generates specific, actionable recommendations. These aren't generic advice — they reference the actual files, error messages, and patterns found in your logs.
+
+### Evolution Strategies
+
+When using the `evolve` action, you can choose a strategy that shapes the recommendations:
+
+| Strategy | Focus | Best For |
+|----------|-------|----------|
+| `auto` | Balanced based on health score | Default — let the engine decide |
+| `balanced` | Equal weight to reliability and features | Stable systems with moderate issues |
+| `innovate` | Prioritize new capabilities | Healthy systems ready to grow |
+| `harden` | Prioritize reliability and error reduction | Systems with frequent failures |
+| `repair-only` | Fix critical issues only | Systems in crisis |
+
+### Evolution Proposals
+
+The `evolve` action produces structured improvement proposals with:
+- A unique `evolution_id` for tracking
+- Prioritized recommendations with category labels (reliability, performance, architecture)
+- Risk assessment (how risky is each proposed change)
+- Estimated improvement (projected health score after implementing recommendations)
+
+### Why Deterministic (Not LLM)?
+
+- **Reproducible** — same logs always produce the same analysis. Critical for debugging and auditing.
+- **Fast** — sub-100ms processing. No API call to an AI provider.
+- **No hallucination risk** — the engine only reports patterns it actually found in the data.
+- **Cost-effective** — pure computation, no token costs.
+
+The tradeoff: the engine can't understand semantic meaning in log messages the way an LLM could. It relies on structural patterns (frequency, timing, severity) rather than understanding what the error message means in context.
 
 ## Prerequisites
 
@@ -25,13 +76,14 @@ Requires a Claw0x API key. Sign up at [claw0x.com](https://claw0x.com) and creat
 export CLAW0X_API_KEY="your-api-key-here"
 ```
 
-## When to use
+## When to Use
 
 - User says "analyze these logs", "what's failing", "improve my agent", "check system health"
 - Agent pipeline needs automated diagnostics after a run
 - User wants structured recommendations for fixing recurring errors
+- Building a self-healing agent that adapts based on its own failure patterns
 
-## API call — Analyze
+## API Call — Analyze
 
 ```bash
 curl -s -X POST https://claw0x.com/v1/call \
@@ -49,7 +101,7 @@ curl -s -X POST https://claw0x.com/v1/call \
   }'
 ```
 
-## API call — Evolve
+## API Call — Evolve
 
 ```bash
 curl -s -X POST https://claw0x.com/v1/call \
@@ -59,7 +111,7 @@ curl -s -X POST https://claw0x.com/v1/call \
     "skill": "capability-evolver",
     "input": {
       "action": "evolve",
-      "strategy": "auto",
+      "strategy": "harden",
       "logs": [...]
     }
   }'
@@ -78,7 +130,7 @@ curl -s -X POST https://claw0x.com/v1/call \
 | `input.strategy` | string | no | `"auto"`, `"balanced"`, `"innovate"`, `"harden"`, `"repair-only"` |
 | `input.target_file` | string | no | Focus analysis on a specific file |
 
-## Output (analyze)
+## Output (Analyze)
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -87,7 +139,7 @@ curl -s -X POST https://claw0x.com/v1/call \
 | `recommendations` | string[] | Actionable improvement suggestions |
 | `summary` | object | Counts: total_logs, error_count, warn_count, unique_patterns |
 
-## Output (evolve)
+## Output (Evolve)
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -99,4 +151,4 @@ curl -s -X POST https://claw0x.com/v1/call \
 
 ## Pricing
 
-Pay-per-successful-call only. Failed calls and 5xx errors are free.
+$0.03 per successful call. Failed calls and 5xx errors are never charged.

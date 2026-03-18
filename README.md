@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/Claw0x-Skills-blue?style=for-the-badge" alt="Claw0x Skills" />
   <img src="https://img.shields.io/badge/TypeScript-Ready-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vercel-Deploy-000?style=for-the-badge&logo=vercel" alt="Vercel" />
-  <img src="https://img.shields.io/github/license/kennyzir/000xxx_skills?style=for-the-badge" alt="License" />
+  <img src="https://img.shields.io/github/license/kennyzir/Claw0X_skills?style=for-the-badge" alt="License" />
 </p>
 
 <h1 align="center">Claw0x Skills</h1>
@@ -12,10 +12,11 @@
 </p>
 
 <p align="center">
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#available-skills">Skills</a> •
-  <a href="#build-your-own">Build Your Own</a> •
-  <a href="#sell-on-claw0x">Sell on Claw0x</a> •
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#available-skills">Skills</a> ·
+  <a href="#free-skills">Free Skills</a> ·
+  <a href="#build-your-own">Build Your Own</a> ·
+  <a href="#sell-on-claw0x">Sell on Claw0x</a> ·
   <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
@@ -25,37 +26,72 @@
 
 This repo contains production-ready **AI skill APIs** — small, focused microservices that do one thing well. Each skill is a single TypeScript file deployed as a serverless function.
 
-**Use them for free**, fork them, or build your own and **sell them on the [Claw0x marketplace](https://claw0x.com)** to earn revenue from every API call.
+Many skills are **completely free** — just [sign up at claw0x.com](https://claw0x.com), create an API key, and start calling. No credit card required. Fork them, use them in your agent pipelines, or build your own and **sell them on the [Claw0x skills layer](https://claw0x.com)** to earn revenue from every API call.
 
 ## Available Skills
 
-| Skill | Endpoint | Description | Status |
-|-------|----------|-------------|--------|
-| 🔍 Web Scraper | `/api/scrape` | Extract structured data (title, headings, links, images) from any URL | ✅ Production |
-| 📧 Email Validator | `/api/validate-email` | Validate email format, domain, and risk scoring | ✅ Production |
-| 💬 Sentiment Analyzer | `/api/sentiment` | Analyze text sentiment with confidence scoring | ✅ Production |
-| 📄 PDF Parser | `/api/parse-pdf` | Extract text and metadata from PDF documents | ✅ Production |
-| 🌐 Translation | `/api/translate` | Translate text between 6+ languages | 🔧 Demo |
-| 🎨 Image Generator | `/api/generate-image` | Generate images from text prompts | 🔧 Placeholder |
-| 📬 AgentMail | `/api/agentmail` | API-first email platform for AI agents | ✅ Production |
-| 🧬 Capability Evolver | `/api/capability-evolver` | Meta-skill for agent self-improvement via EvoMap Hub | ✅ Production |
-| 🧠 Self-Improving Agent | `/api/self-improving-agent` | Capture learnings, errors, corrections for continuous improvement | ✅ Production |
-| 📦 Skills Archive | `/api/skills` | Archive of all ClawHub skills | 🔧 Placeholder |
-| 🔎 Tavily Search | `/api/tavily-search` | LLM-optimized web search with AI answer summaries | ✅ Production |
+| Skill | Endpoint | Description | Pricing | Status |
+|-------|----------|-------------|---------|--------|
+| Web Scraper | `/api/scrape` | Extract structured data (title, headings, links, images) from any URL | $0.005/call | Production |
+| Email Validator | `/api/validate-email` | Validate email format, domain, and risk scoring | **Free** | Production |
+| Sentiment Analyzer | `/api/sentiment` | Analyze text sentiment with confidence scoring | **Free** | Production |
+| PDF Parser | `/api/parse-pdf` | Extract text and metadata from PDF documents | $0.005/call | Production |
+| AI Humanizer | `/api/humanizer` | Remove AI writing patterns from text (24 pattern taxonomy) | Pay-per-call | Production |
+| Translation | `/api/translate` | Translate text between 6+ languages | **Free** | Demo |
+| AgentMail | `/api/agentmail` | API-first email platform for AI agents | $0.02/call | Production |
+| Capability Evolver | `/api/capability-evolver` | Meta-skill for agent self-improvement via EvoMap Hub | $0.03/call | Production |
+| Self-Improving Agent | `/api/self-improving-agent` | Capture learnings, errors, corrections for continuous improvement | **Free** | Production |
+| Skill Scout | `/api/skill-scout` | Discover and recommend skills across Claw0x and community sources | **Free** | Production |
+| Skills Archive | `/api/skills` | Browse and search the full Claw0x skill catalog | **Free** | Production |
+| Tavily Search | `/api/tavily-search` | LLM-optimized web search with AI answer summaries | Freemium | Production |
+| Code Generator | `/api/code-gen` | Generate deployable TypeScript skill handlers from descriptions | $0.01/call | Production |
+
+## Free Skills
+
+Several skills are **completely free to use** — no credit card, no wallet balance, no strings attached. Just get an API key and go.
+
+**How to get started with free skills:**
+
+1. Sign up at [claw0x.com](https://claw0x.com)
+2. Go to Dashboard > API Keys > Create Key
+3. Use the key to call any free skill via the API
+
+**Free skills include:**
+
+- **Sentiment Analyzer** — lexicon-based text sentiment analysis with word-level breakdown
+- **Email Validator** — RFC format validation, domain analysis, and risk scoring
+- **Self-Improving Agent** — structured error/correction/learning event processing for agent self-improvement
+- **Skill Scout** — discover and recommend skills across Claw0x and community sources
+- **Skills Archive** — browse and search the full skill catalog programmatically
+- **Translation** — translate text between 6+ languages (demo)
+
+**Freemium skills** (free daily quota, then pay-per-call):
+
+- **Tavily Search** — 50 free calls/day, then $0.01/call
+
+All free skills use the same API pattern as paid skills — same auth, same request format, same response structure. You can start with free skills and upgrade to paid ones as your needs grow.
+
+```bash
+# Example: call the free Sentiment Analyzer
+curl -s -X POST https://claw0x.com/v1/call \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"skill": "sentiment", "input": {"text": "This product is amazing!"}}'
+```
 
 ## Quick Start
 
 ```bash
 # Clone
-git clone https://github.com/kennyzir/000xxx_skills.git
-cd 000xxx_skills
+git clone https://github.com/kennyzir/Claw0X_skills.git
+cd Claw0X_skills
 
 # Install
 npm install
 
 # Configure
 cp .env.example .env
-# Edit .env → set SKILL_AUTH_TOKEN
+# Edit .env — set SKILL_AUTH_TOKEN
 
 # Run locally
 npm run dev
@@ -93,7 +129,7 @@ vercel login
 vercel deploy --prod
 ```
 
-Set `SKILL_AUTH_TOKEN` in Vercel Dashboard → Settings → Environment Variables. Done.
+Set `SKILL_AUTH_TOKEN` in Vercel Dashboard > Settings > Environment Variables. Done.
 
 ## API Reference
 
@@ -115,7 +151,7 @@ All responses use a consistent format:
 ```
 
 <details>
-<summary><strong>🔍 Web Scraper</strong> — <code>POST /api/scrape</code></summary>
+<summary><strong>Web Scraper</strong> — <code>POST /api/scrape</code></summary>
 
 **Input:**
 ```json
@@ -139,7 +175,7 @@ All responses use a consistent format:
 </details>
 
 <details>
-<summary><strong>📧 Email Validator</strong> — <code>POST /api/validate-email</code></summary>
+<summary><strong>Email Validator</strong> (Free) — <code>POST /api/validate-email</code></summary>
 
 **Input:**
 ```json
@@ -161,7 +197,7 @@ All responses use a consistent format:
 </details>
 
 <details>
-<summary><strong>💬 Sentiment Analyzer</strong> — <code>POST /api/sentiment</code></summary>
+<summary><strong>Sentiment Analyzer</strong> (Free) — <code>POST /api/sentiment</code></summary>
 
 **Input:**
 ```json
@@ -184,7 +220,7 @@ All responses use a consistent format:
 </details>
 
 <details>
-<summary><strong>📄 PDF Parser</strong> — <code>POST /api/parse-pdf</code></summary>
+<summary><strong>PDF Parser</strong> — <code>POST /api/parse-pdf</code></summary>
 
 **Input:**
 ```json
@@ -206,7 +242,7 @@ All responses use a consistent format:
 </details>
 
 <details>
-<summary><strong>🌐 Translation</strong> — <code>POST /api/translate</code></summary>
+<summary><strong>Translation</strong> (Free) — <code>POST /api/translate</code></summary>
 
 **Input:**
 ```json
@@ -218,7 +254,7 @@ All responses use a consistent format:
 {
   "success": true,
   "data": {
-    "translated_text": "你好",
+    "translated_text": "...",
     "source_lang": "en",
     "target_lang": "zh",
     "confidence": 0.95
@@ -231,14 +267,14 @@ Supported languages: `es`, `fr`, `de`, `zh`, `ja`, `ko`
 
 ## Build Your Own Skill
 
-Creating a new skill takes about 5 minutes. Every skill is a single file in the `api/` directory.
+Creating a new skill takes about 5 minutes. Every skill is a single file in the `skills/` directory.
 
 ```typescript
-// api/my-skill.ts
+// skills/my-skill/handler.ts
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { authMiddleware } from '../lib/auth';
-import { validateInput } from '../lib/validation';
-import { successResponse, errorResponse } from '../lib/response';
+import { authMiddleware } from '../../lib/auth';
+import { validateInput } from '../../lib/validation';
+import { successResponse, errorResponse } from '../../lib/response';
 
 async function handler(req: VercelRequest, res: VercelResponse) {
   const validation = validateInput(req.body, {
@@ -260,29 +296,27 @@ async function handler(req: VercelRequest, res: VercelResponse) {
 export default authMiddleware(handler);
 ```
 
-Deploy → your skill is live at `/api/my-skill`.
+Deploy — your skill is live at `/api/my-skill`.
 
 ### Project Structure
 
 ```
-000xxx_skills/
-├── api/                    # Each file = one skill endpoint
-│   ├── scrape.ts           # Web scraper
-│   ├── validate-email.ts   # Email validation
-│   ├── sentiment.ts        # Sentiment analysis
-│   ├── parse-pdf.ts        # PDF text extraction
-│   ├── translate.ts        # Translation
-│   ├── generate-image.ts   # Image generation
-│   ├── agentmail.ts        # AI agent email platform (API wrapper)
-│   ├── capability-evolver.ts # Agent self-improvement via EvoMap
-│   ├── self-improving-agent.ts # Learning & correction capture
-│   ├── skills.ts           # ClawHub skills archive
-│   └── tavily-search.ts   # LLM-optimized web search (Tavily)
-├── lib/                    # Shared utilities (use these!)
-│   ├── auth.ts             # Bearer token auth middleware
-│   ├── validation.ts       # Input schema validation
-│   └── response.ts         # Consistent JSON responses
-├── vercel.json             # Vercel config
+Claw0X_skills/
+├── api/
+│   └── [skill].ts          # Dynamic router — routes to skill handlers
+├── skills/                  # Each folder = one skill
+│   ├── scrape/
+│   │   ├── handler.ts       # Skill implementation
+│   │   └── SKILL.md         # Skill documentation (detailed)
+│   ├── sentiment/
+│   ├── humanizer/
+│   ├── validate-email/
+│   └── ...
+├── lib/                     # Shared utilities
+│   ├── auth.ts              # Bearer token auth middleware
+│   ├── validation.ts        # Input schema validation
+│   └── response.ts          # Consistent JSON responses
+├── vercel.json
 ├── package.json
 └── tsconfig.json
 ```
@@ -297,7 +331,7 @@ The `lib/` directory gives you three things for free:
 
 ## Sell on Claw0x
 
-Built something useful? List it on the [Claw0x marketplace](https://claw0x.com) and earn revenue from every API call.
+Built something useful? List it on the [Claw0x skills layer](https://claw0x.com) and earn revenue from every API call.
 
 **How it works:**
 
@@ -307,26 +341,27 @@ Built something useful? List it on the [Claw0x marketplace](https://claw0x.com) 
 4. Earn per-call revenue when developers use your skill through our gateway
 
 **Pricing models available:**
+- Free (great for adoption and ecosystem growth)
 - Free tier + paid overage (freemium)
 - Pay-per-call
 
-> 💡 Skills listed on Claw0x get automatic discovery, SEO optimization, and exposure to thousands of AI agent developers — zero marketing effort on your end.
+> Skills listed on Claw0x get automatic discovery, SEO optimization, and exposure to thousands of AI agent developers — zero marketing effort on your end.
 
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 **Ideas for contributions:**
-- 🆕 New skills (OCR, code formatting, markdown conversion, etc.)
-- 🔧 Improve existing skills (better error handling, caching, etc.)
-- 📖 Documentation improvements
-- 🧪 Tests
+- New skills (OCR, code formatting, markdown conversion, etc.)
+- Improve existing skills (better error handling, caching, etc.)
+- Documentation improvements
+- Tests
 
 ## Community
 
-- 🌐 [Claw0x Platform](https://claw0x.com)
-- 🐛 [Report Issues](https://github.com/kennyzir/000xxx_skills/issues)
-- 💬 [Discussions](https://github.com/kennyzir/000xxx_skills/discussions)
+- [Claw0x Platform](https://claw0x.com)
+- [Report Issues](https://github.com/kennyzir/Claw0X_skills/issues)
+- [Discussions](https://github.com/kennyzir/Claw0X_skills/discussions)
 
 ## License
 

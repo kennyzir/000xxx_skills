@@ -20,7 +20,6 @@ import agentmail from '../skills/agentmail/handler';
 import awesomeOpenclawSkills from '../skills/awesome-openclaw-skills/handler';
 import capabilityEvolver from '../skills/capability-evolver/handler';
 import codeGen from '../skills/code-gen/handler';
-import generateImage from '../skills/generate-image/handler';
 import humanizer from '../skills/humanizer/handler';
 import parsePdf from '../skills/parse-pdf/handler';
 import scrape from '../skills/scrape/handler';
@@ -28,7 +27,6 @@ import selfImprovingAgent from '../skills/self-improving-agent/handler';
 import sentiment from '../skills/sentiment/handler';
 import skillScout from '../skills/skill-scout/handler';
 import tavilySearch from '../skills/tavily-search/handler';
-import translate from '../skills/translate/handler';
 import validateEmail from '../skills/validate-email/handler';
 
 type Handler = (req: VercelRequest, res: VercelResponse) => Promise<void> | void;
@@ -38,7 +36,6 @@ const SKILL_MAP: Record<string, Handler> = {
   'awesome-openclaw-skills': awesomeOpenclawSkills,
   'capability-evolver': capabilityEvolver,
   'code-gen': codeGen,
-  'generate-image': generateImage,
   'humanizer': humanizer,
   'parse-pdf': parsePdf,
   'scrape': scrape,
@@ -46,7 +43,6 @@ const SKILL_MAP: Record<string, Handler> = {
   'sentiment': sentiment,
   'skill-scout': skillScout,
   'tavily-search': tavilySearch,
-  'translate': translate,
   'validate-email': validateEmail,
 };
 

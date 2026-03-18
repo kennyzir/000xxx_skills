@@ -1,10 +1,11 @@
 ---
 name: claw0x-awesome-openclaw-skills
 description: >
-  Search and discover from 5,400+ curated OpenClaw skills via the Claw0x API.
+  Search and discover skills from the live Claw0x catalog via the Claw0x API.
   Use when the user asks to find skills, browse the skill catalog, search for
-  agent capabilities, list skill categories, or discover what tools are available
-  in the OpenClaw ecosystem. Filter by category, keyword, or use case.
+  agent capabilities, list skill categories, or discover what tools are available.
+  Returns real-time data with pricing, trust scores, and usage stats.
+  Filter by category, keyword, or use case.
 allowed-tools: Bash(curl *)
 metadata:
   requires:
@@ -14,7 +15,7 @@ metadata:
 
 # Awesome OpenClaw Skills (Discovery)
 
-Search and browse a curated catalog of OpenClaw skills. Find the right skill for any agent task.
+Search and browse the live Claw0x skill catalog. Returns real-time data including pricing, trust scores, and call stats.
 
 ## Prerequisites
 

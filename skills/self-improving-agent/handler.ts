@@ -4,14 +4,14 @@ import { validateInput } from '../../lib/validation';
 import { successResponse, errorResponse } from '../../lib/response';
 
 /**
- * self-improving-agent — Pure Logic Skill
+ * self-improving-agent �?Pure Logic Skill
  * Captures learnings, errors, and corrections to enable continuous improvement.
  *
  * Use when: (1) A command or operation fails unexpectedly,
  * (2) User corrects an agent's output, (3) A new pattern is discovered.
  *
- * 类型: 纯逻辑处理 (无外部 API 依赖)
- * 来源: https://github.com/pskoett/pskoett-ai-skills
+ * 类型: 纯逻辑处理 (无外�?API 依赖)
+ * 来源: https://github.com/kennyzir/Claw0X_skills
  */
 
 // ─── Types ───────────────────────────────────────────────────
@@ -159,23 +159,23 @@ function buildSummary(entries: ProcessedEntry[]): BatchSummary {
   }
   const patterns = Object.entries(contextCounts)
     .filter(([, count]) => count >= 2)
-    .map(([ctx, count]) => `"${ctx}" appeared ${count} times — likely a recurring issue`);
+    .map(([ctx, count]) => `"${ctx}" appeared ${count} times �?likely a recurring issue`);
 
   const recommendations: string[] = [];
   if ((bySeverity['critical'] || 0) > 0) {
-    recommendations.push('Critical issues detected — prioritize immediate fixes');
+    recommendations.push('Critical issues detected �?prioritize immediate fixes');
   }
   if ((bySeverity['high'] || 0) >= 2) {
-    recommendations.push('Multiple high-severity events — consider a systematic review');
+    recommendations.push('Multiple high-severity events �?consider a systematic review');
   }
   if (entries.filter(e => e.type === 'correction').length >= 2) {
-    recommendations.push('Multiple corrections recorded — update base prompts or rules to prevent recurrence');
+    recommendations.push('Multiple corrections recorded �?update base prompts or rules to prevent recurrence');
   }
   if (patterns.length > 0) {
-    recommendations.push('Recurring contexts detected — create dedicated handling rules');
+    recommendations.push('Recurring contexts detected �?create dedicated handling rules');
   }
   if (entries.some(e => e.suggested_rule)) {
-    recommendations.push('Suggested rules generated — review and add to agent configuration');
+    recommendations.push('Suggested rules generated �?review and add to agent configuration');
   }
 
   const topTags = Object.entries(tagCounts)

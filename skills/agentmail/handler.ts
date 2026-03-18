@@ -5,12 +5,12 @@ import { validateInput } from '../../lib/validation';
 import { successResponse, errorResponse } from '../../lib/response';
 
 /**
- * agentmail �?API Wrapper Skill
+ * agentmail �?API Wrapper Skill
  * API-first email platform designed for AI agents. Create and manage dedicated ema
  * 
- * 类型: 包装上游 API (需要配�?AGENTMAIL_API_URL �?AGENTMAIL_API_KEY)
+ * 类型: 包装上游 API (需要配�?AGENTMAIL_API_URL �?AGENTMAIL_API_KEY)
  * 标签: api, email, agent, ai, data, pdf, search, workflow
- * 来源: https://github.com/openclaw/skills/blob/main/skills/adboio/agentmail/SKILL.md
+ * 来源: https://github.com/kennyzir/Claw0X_skills (originally from openclaw registry)
  */
 
 async function handler(req: VercelRequest, res: VercelResponse) {

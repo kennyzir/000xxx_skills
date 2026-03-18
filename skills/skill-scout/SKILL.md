@@ -18,22 +18,68 @@ metadata:
 
 Discover and recommend agent skills across the Claw0x catalog and community sources (ClawHub, Anthropic, VoltAgent). Returns ranked results with relevance scores, pricing, and install commands.
 
+> **Free to use.** This skill costs nothing. Just [sign up at claw0x.com](https://claw0x.com), create an API key, and start calling. No credit card, no wallet top-up required.
+
+## How It Works — Under the Hood
+
+Skill Scout is a meta-discovery skill that searches across multiple skill registries and returns unified, ranked results. Think of it as a search engine for agent capabilities.
+
+### Multi-Source Search Architecture
+
+Unlike `awesome-openclaw-skills` (which only searches the Claw0x catalog), Skill Scout aggregates results from multiple sources:
+
+1. **Claw0x native catalog** — production skills deployed on Claw0x infrastructure. These come with trust scores, pricing, usage stats, and guaranteed API availability.
+
+2. **Community sources** — skills from ClawHub, Anthropic's tool ecosystem, and VoltAgent's registry. These are indexed and normalized into a common format for comparison.
+
+### Search & Ranking Pipeline
+
+1. **Query expansion** — your search query is matched against skill names, descriptions, tags, and categories across all sources. The matching is fuzzy — "web scrape" will match "Web Scraper", "scraping tool", etc.
+
+2. **Relevance scoring** — each result gets a relevance score (0–100) based on how well it matches the query. Exact name matches score highest, followed by description matches, then tag matches.
+
+3. **Cross-source normalization** — results from different sources are normalized into a common schema so you can compare them directly. Claw0x skills include pricing and trust scores; community skills include install commands and source URLs.
+
+4. **Ranking** — results are sorted by relevance score first, then by trust score (for Claw0x skills) or community popularity (for community skills).
+
+### Search vs. Recommend Mode
+
+- **Search** (`action: "search"` or default) — returns all matching skills, ranked by relevance. Good for broad exploration.
+- **Recommend** (`action: "recommend"`) — returns a curated shortlist with the skill most likely to solve your specific task at the top. Good for agents that need to pick one tool and go.
+
+### Why This Matters for Agent Orchestration
+
+An orchestrator agent building a multi-step pipeline can use Skill Scout to:
+
+1. Describe what it needs ("I need to extract text from a PDF")
+2. Get ranked options with pricing and trust data
+3. Pick the best option based on cost, reliability, and relevance
+4. Call it via the Claw0x gateway
+
+This enables agents to compose workflows dynamically without hardcoded tool lists.
+
 ## Prerequisites
 
-Requires a Claw0x API key. Sign up at [claw0x.com](https://claw0x.com) and create a key in your dashboard. Set it as an environment variable:
+This is a free skill. Just get an API key:
+
+1. Sign up at [claw0x.com](https://claw0x.com)
+2. Go to Dashboard → API Keys → Create Key
+3. Set it as an environment variable:
 
 ```bash
 export CLAW0X_API_KEY="your-api-key-here"
 ```
 
-## When to use
+No credit card or wallet balance needed.
+
+## When to Use
 
 - User says "find the best skill for", "recommend a skill", "what should I use for"
 - Agent needs to pick the right tool for a subtask
 - User wants to compare Claw0x native skills vs community alternatives
 - User asks to browse skill categories or explore the ecosystem
 
-## API call — Search
+## API Call — Search
 
 ```bash
 curl -s -X POST https://claw0x.com/v1/call \
@@ -42,12 +88,12 @@ curl -s -X POST https://claw0x.com/v1/call \
   -d '{
     "skill": "skill-scout",
     "input": {
-      "query": "$ARGUMENTS"
+      "query": "web scraping"
     }
   }'
 ```
 
-## API call — Recommend
+## API Call — Recommend
 
 ```bash
 curl -s -X POST https://claw0x.com/v1/call \
@@ -57,7 +103,7 @@ curl -s -X POST https://claw0x.com/v1/call \
     "skill": "skill-scout",
     "input": {
       "action": "recommend",
-      "query": "web scraping"
+      "query": "extract text from PDF"
     }
   }'
 ```
@@ -72,7 +118,7 @@ curl -s -X POST https://claw0x.com/v1/call \
 | `input.limit` | number | no | Max results (default 10, max 50) |
 | `input.action` | string | no | `"search"` (default), `"recommend"`, or `"categories"` |
 
-## Output (search/recommend)
+## Output (Search/Recommend)
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -83,7 +129,7 @@ curl -s -X POST https://claw0x.com/v1/call \
 | `skills[].trust_score` | number | Trust score 0–100 (Claw0x skills only) |
 | `skills[].api_call` | string | Example API call (Claw0x skills only) |
 
-## Output (categories)
+## Output (Categories)
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -91,4 +137,4 @@ curl -s -X POST https://claw0x.com/v1/call \
 
 ## Pricing
 
-Pay-per-successful-call only. Failed calls and 5xx errors are free.
+**Free.** Apply for an API key and use it at no cost. No credit card required.
