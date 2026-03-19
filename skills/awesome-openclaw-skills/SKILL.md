@@ -6,7 +6,6 @@ description: >
   agent capabilities, list skill categories, or discover what tools are available.
   Returns real-time data with pricing, trust scores, and usage stats.
   Filter by category, keyword, or use case.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -30,20 +29,6 @@ export CLAW0X_API_KEY="your-api-key-here"
 - User says "find a skill for", "what skills are available", "browse skills", "list categories"
 - Agent needs to discover which skill to use for a specific task
 - User wants to explore the OpenClaw ecosystem
-
-## API call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "awesome-openclaw-skills",
-    "input": {
-      "query": "$ARGUMENTS"
-    }
-  }'
-```
 
 ## Input
 
@@ -69,6 +54,12 @@ curl -s -X POST https://claw0x.com/v1/call \
 | `categories` | array | Category names with skill counts |
 | `total_skills` | number | Total skills in catalog |
 
+## Error Codes
+
+- `400` — Invalid input parameters
+- `401` — Invalid or missing API key
+- `500` — Processing failed (not billed)
+
 ## Pricing
 
-Pay-per-successful-call only. Failed calls and 5xx errors are free.
+Pay-per-successful-call only. Failed calls and 5xx errors are never charged.

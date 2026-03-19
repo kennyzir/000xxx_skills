@@ -5,7 +5,6 @@ description: >
   Use when the user asks to parse a PDF, extract text from a document, get page
   count, read a PDF by URL, or analyze PDF metadata. Handles files up to 10MB.
   Server-side processing — no local dependencies required.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -66,20 +65,6 @@ export CLAW0X_API_KEY="your-api-key-here"
 - Agent pipeline needs PDF content as an intermediate step (e.g., summarize a paper, extract data from a report)
 - User provides a PDF URL and wants the text or metadata
 - Building a document processing pipeline
-
-## API Call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "parse-pdf",
-    "input": {
-      "pdf_url": "https://example.com/document.pdf"
-    }
-  }'
-```
 
 ## Input
 

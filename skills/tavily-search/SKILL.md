@@ -6,7 +6,6 @@ description: >
   news, research a topic online, or when the agent needs up-to-date data that is
   outside its training cutoff. Returns ranked results with snippets and an AI-generated
   answer summary.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -70,20 +69,6 @@ export CLAW0X_API_KEY="your-api-key-here"
 - Agent needs real-time or current data (prices, news, events, documentation)
 - Any query where the answer requires information beyond the model's training data
 - Research pipelines that need to gather information from multiple web sources
-
-## API Call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "tavily-search",
-    "input": {
-      "query": "latest Node.js LTS version 2026"
-    }
-  }'
-```
 
 ## Input
 

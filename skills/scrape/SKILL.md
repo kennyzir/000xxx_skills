@@ -5,7 +5,6 @@ description: >
   Use when the user asks to scrape a website, extract page content, get headings
   and links from a URL, or pull structured data from a web page. Returns title,
   headings, links, images, and paragraph text. Server-side — no browser needed.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -66,20 +65,6 @@ export CLAW0X_API_KEY="your-api-key-here"
 - Agent needs structured web content (headings, links, images) from a URL
 - Building a research pipeline that collects data from multiple pages
 - User wants a quick summary of what's on a page
-
-## API Call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "scrape",
-    "input": {
-      "url": "https://example.com"
-    }
-  }'
-```
 
 ## Input
 

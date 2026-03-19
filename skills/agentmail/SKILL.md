@@ -5,7 +5,6 @@ description: >
   agent needs to send email, manage mailboxes, read incoming messages, or handle
   email workflows programmatically. Designed for autonomous agent-to-agent and
   agent-to-human email communication.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -61,23 +60,6 @@ export CLAW0X_API_KEY="your-api-key-here"
 - Agent pipeline needs to send notifications, reports, or alerts via email
 - Autonomous agent needs its own email identity for communication
 - Multi-agent system needs asynchronous message passing
-
-## API Call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "agentmail",
-    "input": {
-      "action": "send",
-      "to": "recipient@example.com",
-      "subject": "Daily report from your research agent",
-      "body": "Here are today findings..."
-    }
-  }'
-```
 
 ## Input
 

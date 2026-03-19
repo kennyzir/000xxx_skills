@@ -5,7 +5,6 @@ description: >
   description via the Claw0x API. Use when the user asks to generate skill code,
   create a new API handler, scaffold a serverless function, or auto-generate
   backend code from a README or description. Powered by Gemini LLM.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -101,22 +100,6 @@ export CLAW0X_API_KEY="your-api-key-here"
 - Agent pipeline needs to auto-generate skill implementations from descriptions
 - User provides a README or description and wants working backend code
 - Bootstrapping a new skill quickly before customizing the logic
-
-## API Call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "code-gen",
-    "input": {
-      "slug": "my-new-skill",
-      "name": "My New Skill",
-      "description": "Extracts key entities from unstructured text"
-    }
-  }'
-```
 
 ## Input
 

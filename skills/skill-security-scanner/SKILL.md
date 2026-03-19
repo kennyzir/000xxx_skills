@@ -14,13 +14,13 @@ metadata:
 
 # Security Scanner
 
-Scan AI agent skills for security vulnerabilities across three layers: dependency CVEs, dangerous code patterns, and undeclared permissions. Returns a structured JSON risk report with an overall score (0–100).
+Scan AI agent skills for security vulnerabilities across three layers: dependency CVEs, dangerous code patterns, and undeclared permissions. Returns a structured JSON risk report with an overall score (0�?00).
 
 > **Free to use.** This skill costs nothing. Just [sign up at claw0x.com](https://claw0x.com), create an API key, and start calling. No credit card, no wallet top-up required.
 
-## How It Works — Under the Hood
+## How It Works �?Under the Hood
 
-This skill runs a three-layer security analysis pipeline. No LLM involved — pure deterministic scanning logic.
+This skill runs a three-layer security analysis pipeline. No LLM involved �?pure deterministic scanning logic.
 
 ### Layer 1: Dependency CVE Scanning
 
@@ -53,23 +53,23 @@ Source files (`.ts`, `.js`, `.py`) are scanned line-by-line against 8 pre-compil
 The SKILL.md frontmatter `allowed-tools` field is cross-referenced against actual code behavior detected by the static analyzer.
 
 - Parses declared permissions from SKILL.md YAML frontmatter
-- Maps code findings to permission categories (e.g., `child_process.exec` → `Bash(*)`)
+- Maps code findings to permission categories (e.g., `child_process.exec` �?`Bash(*)`)
 - Reports any permissions detected in code but not declared in frontmatter
 - Score contribution: +5 per undeclared permission (capped at 10)
 
 ### Risk Score
 
-The three layer scores are summed into a total risk score (0–100):
+The three layer scores are summed into a total risk score (0�?00):
 
 | Score Range | Risk Level |
 |-------------|------------|
-| 0–20 | Low |
-| 21–50 | Medium |
-| 51–100 | High |
+| 0�?0 | Low |
+| 21�?0 | Medium |
+| 51�?00 | High |
 
 ## Three Input Modes
 
-You can scan a skill using any of these three modes (mutually exclusive — provide exactly one):
+You can scan a skill using any of these three modes (mutually exclusive �?provide exactly one):
 
 ### Mode 1: GitHub Repo URL
 
@@ -104,7 +104,7 @@ Submit code directly along with optional dependency and SKILL.md data. No GitHub
 This is a free skill. Just get an API key:
 
 1. Sign up at [claw0x.com](https://claw0x.com)
-2. Go to Dashboard → API Keys → Create Key
+2. Go to Dashboard �?API Keys �?Create Key
 3. Store the key securely using one of these methods:
    - Add `CLAW0X_API_KEY` to your agent's secure environment variables
    - Use your platform's secret manager (e.g. GitHub Secrets, Vercel env vars, AWS Secrets Manager)
@@ -121,20 +121,6 @@ No credit card or wallet balance needed.
 - Platform review pipeline needs automated security assessment
 - User asks "is this skill safe?", "scan for vulnerabilities", "check skill security"
 
-## API Call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "security-scanner",
-    "input": {
-      "repo_url": "https://github.com/owner/repo"
-    }
-  }'
-```
-
 ## Input
 
 Provide exactly one of the three input modes:
@@ -142,9 +128,9 @@ Provide exactly one of the three input modes:
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `repo_url` | string | one of three | GitHub repo URL (`https://github.com/{owner}/{repo}`) |
-| `skill_slug` | string | one of three | Claw0x skill slug (1–100 chars) |
+| `skill_slug` | string | one of three | Claw0x skill slug (1�?00 chars) |
 | `code` | string | one of three | Source code to scan (max 500KB) |
-| `dependencies` | object | no | Package name → version map (used with `code` mode) |
+| `dependencies` | object | no | Package name �?version map (used with `code` mode) |
 | `skill_md` | string | no | SKILL.md content for permission auditing (used with `code` mode) |
 
 ## Output Fields
@@ -152,7 +138,7 @@ Provide exactly one of the three input modes:
 | Field | Type | Description |
 |-------|------|-------------|
 | `overall_risk` | string | Risk level: `low`, `medium`, or `high` |
-| `risk_score` | number | Numeric risk score (0–100) |
+| `risk_score` | number | Numeric risk score (0�?00) |
 | `input_mode` | string | Which input mode was used |
 | `repo_url` | string \| null | Repository URL if applicable |
 | `dependency_scan.packages_scanned` | number | Number of packages checked |
@@ -215,7 +201,7 @@ Provide exactly one of the three input modes:
         "file": "input.ts",
         "line": 1,
         "match": "require('child_process')",
-        "description": "Shell command execution detected — risk of injection attacks"
+        "description": "Shell command execution detected �?risk of injection attacks"
       }
     ],
     "finding_counts": {
@@ -232,14 +218,21 @@ Provide exactly one of the three input modes:
     "undeclared_risks": ["Bash(*)"]
   },
   "recommendations": [
-    "Critical: Shell injection pattern detected — avoid passing unsanitized input to child_process",
-    "High: lodash@4.17.20 has known vulnerabilities — upgrade to latest version",
+    "Critical: Shell injection pattern detected �?avoid passing unsanitized input to child_process",
+    "High: lodash@4.17.20 has known vulnerabilities �?upgrade to latest version",
     "Undeclared permission: Bash(*) detected in code but not declared in SKILL.md"
   ],
   "scanned_at": "2025-01-15T10:30:00.000Z",
   "scan_duration_ms": 1250
 }
 ```
+
+## Error Codes
+
+- `400` — No valid input provided (need repo_url, skill_slug, or code)
+- `401` — Invalid or missing API key
+- `404` — Skill slug not found in catalog
+- `500` — Scan failed (not billed)
 
 ## Pricing
 

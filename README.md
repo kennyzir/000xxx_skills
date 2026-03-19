@@ -73,7 +73,7 @@ All free skills use the same API pattern as paid skills — same auth, same requ
 
 ```bash
 # Example: call the free Sentiment Analyzer
-curl -s -X POST https://claw0x.com/v1/call \
+curl -s -X POST https://api.claw0x.com/v1/call \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"skill": "sentiment", "input": {"text": "This product is amazing!"}}'

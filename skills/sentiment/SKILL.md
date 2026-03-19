@@ -5,7 +5,6 @@ description: >
   analyze sentiment, detect emotion or mood in text, check if text is positive
   or negative, or score the tone of a message. Returns sentiment label, score,
   confidence, and word-level breakdown. No LLM needed — deterministic analysis.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -71,20 +70,6 @@ No credit card or wallet balance needed.
 - Evaluating customer feedback, reviews, or social media posts
 - Filtering or routing messages based on emotional tone
 
-## API Call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "sentiment",
-    "input": {
-      "text": "I love this product, but the shipping was terrible."
-    }
-  }'
-```
-
 ## Input
 
 | Field | Type | Required | Description |
@@ -121,6 +106,12 @@ curl -s -X POST https://claw0x.com/v1/call \
 ```
 
 The mixed sentiment (one positive word, one negative word) results in a near-zero score, correctly labeled "neutral".
+
+## Error Codes
+
+- `400` — Missing or empty text input
+- `401` — Invalid or missing API key
+- `500` — Processing failed (not billed)
 
 ## Pricing
 

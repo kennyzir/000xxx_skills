@@ -5,7 +5,6 @@ description: >
   user asks to humanize text, make AI writing sound natural, remove AI patterns,
   rewrite to avoid AI detection, or clean up robotic-sounding content. Based on
   Wikipedia's 24 "Signs of AI writing" patterns. LLM-powered with regex fallback.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -105,20 +104,6 @@ export CLAW0X_API_KEY="your-api-key-here"
 - User wants text to pass AI detection tools (GPTZero, Originality.ai, etc.)
 - Agent pipeline produces text that needs to sound human-written
 - Content teams need to clean up AI-drafted blog posts, emails, or documentation
-
-## API Call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "humanizer",
-    "input": {
-      "text": "Your AI-generated text here..."
-    }
-  }'
-```
 
 ## Input
 

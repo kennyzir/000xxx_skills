@@ -6,7 +6,6 @@ description: >
   corrects agent output, a new pattern is discovered, or the agent needs to log
   and process improvement events. Returns structured insights, suggested rules,
   and batch summaries. Supports single events and batch processing.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -19,24 +18,24 @@ Log errors, corrections, learnings, and patterns. Get back structured insights, 
 
 > **Free to use.** This skill costs nothing. Just [sign up at claw0x.com](https://claw0x.com), create an API key, and start calling. No credit card, no wallet top-up required.
 
-## How It Works — Under the Hood
+## How It Works �?Under the Hood
 
-This skill provides a structured event processing pipeline for agent self-improvement. It doesn't store data persistently — instead, it processes each event (or batch of events) in real time and returns actionable insights.
+This skill provides a structured event processing pipeline for agent self-improvement. It doesn't store data persistently �?instead, it processes each event (or batch of events) in real time and returns actionable insights.
 
 ### The Processing Pipeline
 
-1. **Event classification** — each incoming event is classified by type (`error`, `correction`, `learning`, `pattern`). If no severity is provided, it's auto-inferred based on the event type and content keywords.
+1. **Event classification** �?each incoming event is classified by type (`error`, `correction`, `learning`, `pattern`). If no severity is provided, it's auto-inferred based on the event type and content keywords.
 
-2. **Auto-tagging** — the skill scans the `context` and `detail` fields for known patterns and applies tags automatically. For example:
+2. **Auto-tagging** �?the skill scans the `context` and `detail` fields for known patterns and applies tags automatically. For example:
    - An error mentioning "timeout" or "ETIMEDOUT" gets tagged `[network]`, `[timeout]`
    - A correction in a `.ts` file gets tagged `[typescript]`
    - A learning about "retry" gets tagged `[resilience]`
 
-3. **Insight generation** — for each event, the skill generates an `actionable_insight` — a one-sentence summary of what the agent should do differently. For corrections, this compares the `previous_attempt` with the `corrected_output` to identify the delta.
+3. **Insight generation** �?for each event, the skill generates an `actionable_insight` �?a one-sentence summary of what the agent should do differently. For corrections, this compares the `previous_attempt` with the `corrected_output` to identify the delta.
 
-4. **Rule suggestion** — each event produces a `suggested_rule` — a concrete, implementable rule the agent could add to its system prompt or configuration. Example: `"When calling external APIs, set a 10s timeout and retry once on ETIMEDOUT."`
+4. **Rule suggestion** �?each event produces a `suggested_rule` �?a concrete, implementable rule the agent could add to its system prompt or configuration. Example: `"When calling external APIs, set a 10s timeout and retry once on ETIMEDOUT."`
 
-5. **Batch analysis** (for multi-event submissions) — when you send an `events` array, the skill also produces:
+5. **Batch analysis** (for multi-event submissions) �?when you send an `events` array, the skill also produces:
    - Breakdown by type and severity
    - Top recurring tags (indicating systemic issues)
    - Pattern detection across events (e.g., "3 of 5 errors are network-related")
@@ -47,10 +46,10 @@ This skill provides a structured event processing pipeline for agent self-improv
 Traditional software logs errors and a human reads them later. Autonomous agents need to process their own failures in real time and adapt. This skill provides the structured feedback loop:
 
 ```
-Agent runs → Error occurs → Log to self-improving-agent → Get insight + rule → Agent updates behavior
+Agent runs �?Error occurs �?Log to self-improving-agent �?Get insight + rule �?Agent updates behavior
 ```
 
-The skill is stateless by design — it doesn't accumulate history across calls. If you need persistent memory, store the returned `entries` in your own database and feed historical context back in future calls.
+The skill is stateless by design �?it doesn't accumulate history across calls. If you need persistent memory, store the returned `entries` in your own database and feed historical context back in future calls.
 
 ### Event Types Explained
 
@@ -66,7 +65,7 @@ The skill is stateless by design — it doesn't accumulate history across calls.
 This is a free skill. Just get an API key:
 
 1. Sign up at [claw0x.com](https://claw0x.com)
-2. Go to Dashboard → API Keys → Create Key
+2. Go to Dashboard �?API Keys �?Create Key
 3. Set it as an environment variable:
 
 ```bash
@@ -81,39 +80,6 @@ No credit card or wallet balance needed.
 - User corrects agent output and the agent should learn from it
 - Agent discovers a new pattern worth remembering
 - Agent pipeline needs to process a batch of improvement events
-
-## API Call — Single Event
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "self-improving-agent",
-    "input": {
-      "type": "error",
-      "context": "api-client.ts",
-      "detail": "Connection refused on port 3000"
-    }
-  }'
-```
-
-## API Call — Batch Events
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "self-improving-agent",
-    "input": {
-      "events": [
-        {"type": "error", "context": "auth.ts", "detail": "Token expired"},
-        {"type": "correction", "context": "formatter.ts", "detail": "Use tabs not spaces", "previous_attempt": "  const x", "corrected_output": "\tconst x"}
-      ]
-    }
-  }'
-```
 
 ## Input (Single Event)
 
@@ -159,11 +125,17 @@ curl -s -X POST https://claw0x.com/v1/call \
     "type": "error",
     "severity": "high",
     "tags": ["network", "timeout", "payment"],
-    "actionable_insight": "Payment API call timed out — consider reducing timeout and adding retry with exponential backoff.",
+    "actionable_insight": "Payment API call timed out �?consider reducing timeout and adding retry with exponential backoff.",
     "suggested_rule": "Set a 10s timeout for payment API calls. Retry once on ETIMEDOUT with 2s backoff."
   }]
 }
 ```
+
+## Error Codes
+
+- `400` — Missing required fields (type, context, detail)
+- `401` — Invalid or missing API key
+- `500` — Processing failed (not billed)
 
 ## Pricing
 

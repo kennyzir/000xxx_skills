@@ -6,7 +6,6 @@ description: >
   structured improvement proposals. Use when the user or agent asks to analyze
   logs, diagnose failures, improve agent reliability, generate evolution proposals,
   or assess system health. Supports analyze, evolve, and status actions.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -15,29 +14,29 @@ metadata:
 
 # Capability Evolver
 
-Analyze agent runtime logs, detect patterns, compute health scores, and generate structured improvement proposals. Pure logic — no external AI dependency.
+Analyze agent runtime logs, detect patterns, compute health scores, and generate structured improvement proposals. Pure logic �?no external AI dependency.
 
-## How It Works — Under the Hood
+## How It Works �?Under the Hood
 
-Capability Evolver is a deterministic analysis engine that processes structured log data and produces actionable diagnostics. No LLM is involved — the analysis is rule-based, which means results are reproducible and fast.
+Capability Evolver is a deterministic analysis engine that processes structured log data and produces actionable diagnostics. No LLM is involved �?the analysis is rule-based, which means results are reproducible and fast.
 
 ### Analysis Engine
 
 The core engine processes log entries through several analysis passes:
 
-1. **Pattern detection** — logs are grouped by `context` (file/module) and `level` (error/warn/info/debug). The engine looks for:
-   - **Repeated errors** — the same error message appearing multiple times indicates a systemic issue, not a transient failure
-   - **Error cascades** — errors in module A followed by errors in module B within a short time window suggest a dependency chain failure
-   - **Regression signals** — errors that appear after a period of clean logs suggest a recent change broke something
-   - **Inefficiency patterns** — excessive warn-level logs or repeated retries indicate performance issues
+1. **Pattern detection** �?logs are grouped by `context` (file/module) and `level` (error/warn/info/debug). The engine looks for:
+   - **Repeated errors** �?the same error message appearing multiple times indicates a systemic issue, not a transient failure
+   - **Error cascades** �?errors in module A followed by errors in module B within a short time window suggest a dependency chain failure
+   - **Regression signals** �?errors that appear after a period of clean logs suggest a recent change broke something
+   - **Inefficiency patterns** �?excessive warn-level logs or repeated retries indicate performance issues
 
-2. **Health scoring** — a system health score (0–100) is computed based on:
+2. **Health scoring** �?a system health score (0�?00) is computed based on:
    - Error rate (errors / total logs)
    - Error diversity (unique error messages / total errors)
    - Warn-to-error ratio
    - Time distribution (clustered errors score worse than spread-out errors)
 
-3. **Recommendation generation** — based on detected patterns, the engine generates specific, actionable recommendations. These aren't generic advice — they reference the actual files, error messages, and patterns found in your logs.
+3. **Recommendation generation** �?based on detected patterns, the engine generates specific, actionable recommendations. These aren't generic advice �?they reference the actual files, error messages, and patterns found in your logs.
 
 ### Evolution Strategies
 
@@ -45,7 +44,7 @@ When using the `evolve` action, you can choose a strategy that shapes the recomm
 
 | Strategy | Focus | Best For |
 |----------|-------|----------|
-| `auto` | Balanced based on health score | Default — let the engine decide |
+| `auto` | Balanced based on health score | Default �?let the engine decide |
 | `balanced` | Equal weight to reliability and features | Stable systems with moderate issues |
 | `innovate` | Prioritize new capabilities | Healthy systems ready to grow |
 | `harden` | Prioritize reliability and error reduction | Systems with frequent failures |
@@ -61,10 +60,10 @@ The `evolve` action produces structured improvement proposals with:
 
 ### Why Deterministic (Not LLM)?
 
-- **Reproducible** — same logs always produce the same analysis. Critical for debugging and auditing.
-- **Fast** — sub-100ms processing. No API call to an AI provider.
-- **No hallucination risk** — the engine only reports patterns it actually found in the data.
-- **Cost-effective** — pure computation, no token costs.
+- **Reproducible** �?same logs always produce the same analysis. Critical for debugging and auditing.
+- **Fast** �?sub-100ms processing. No API call to an AI provider.
+- **No hallucination risk** �?the engine only reports patterns it actually found in the data.
+- **Cost-effective** �?pure computation, no token costs.
 
 The tradeoff: the engine can't understand semantic meaning in log messages the way an LLM could. It relies on structural patterns (frequency, timing, severity) rather than understanding what the error message means in context.
 
@@ -82,40 +81,6 @@ export CLAW0X_API_KEY="your-api-key-here"
 - Agent pipeline needs automated diagnostics after a run
 - User wants structured recommendations for fixing recurring errors
 - Building a self-healing agent that adapts based on its own failure patterns
-
-## API Call — Analyze
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "capability-evolver",
-    "input": {
-      "action": "analyze",
-      "logs": [
-        {"timestamp": "2026-03-17T10:00:00Z", "level": "error", "message": "Connection refused", "context": "api-client.ts"},
-        {"timestamp": "2026-03-17T10:05:00Z", "level": "warn", "message": "Retry limit reached", "context": "api-client.ts"}
-      ]
-    }
-  }'
-```
-
-## API Call — Evolve
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "capability-evolver",
-    "input": {
-      "action": "evolve",
-      "strategy": "harden",
-      "logs": [...]
-    }
-  }'
-```
 
 ## Input
 
@@ -135,7 +100,7 @@ curl -s -X POST https://claw0x.com/v1/call \
 | Field | Type | Description |
 |-------|------|-------------|
 | `patterns` | array | Detected error/regression/inefficiency patterns with severity |
-| `health_score` | number | System health 0–100 |
+| `health_score` | number | System health 0�?00 |
 | `recommendations` | string[] | Actionable improvement suggestions |
 | `summary` | object | Counts: total_logs, error_count, warn_count, unique_patterns |
 
@@ -148,6 +113,12 @@ curl -s -X POST https://claw0x.com/v1/call \
 | `recommendations` | array | Prioritized improvements with category and approach |
 | `risk_assessment` | object | Risk level and contributing factors |
 | `estimated_improvement` | string | Projected health score improvement |
+
+## Error Codes
+
+- `400` — Invalid action or missing logs array
+- `401` — Invalid or missing API key
+- `500` — Processing failed (not billed)
 
 ## Pricing
 

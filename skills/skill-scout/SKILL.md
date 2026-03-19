@@ -7,7 +7,6 @@ description: >
   agent tools, or search across Claw0x native skills and community contributions
   from ClawHub, Anthropic, and VoltAgent. Returns ranked results with pricing,
   trust scores, and install commands.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -20,7 +19,7 @@ Discover and recommend agent skills across the Claw0x catalog and community sour
 
 > **Free to use.** This skill costs nothing. Just [sign up at claw0x.com](https://claw0x.com), create an API key, and start calling. No credit card, no wallet top-up required.
 
-## How It Works — Under the Hood
+## How It Works �?Under the Hood
 
 Skill Scout is a meta-discovery skill that searches across multiple skill registries and returns unified, ranked results. Think of it as a search engine for agent capabilities.
 
@@ -28,24 +27,24 @@ Skill Scout is a meta-discovery skill that searches across multiple skill regist
 
 Unlike `awesome-openclaw-skills` (which only searches the Claw0x catalog), Skill Scout aggregates results from multiple sources:
 
-1. **Claw0x native catalog** — production skills deployed on Claw0x infrastructure. These come with trust scores, pricing, usage stats, and guaranteed API availability.
+1. **Claw0x native catalog** �?production skills deployed on Claw0x infrastructure. These come with trust scores, pricing, usage stats, and guaranteed API availability.
 
-2. **Community sources** — skills from ClawHub, Anthropic's tool ecosystem, and VoltAgent's registry. These are indexed and normalized into a common format for comparison.
+2. **Community sources** �?skills from ClawHub, Anthropic's tool ecosystem, and VoltAgent's registry. These are indexed and normalized into a common format for comparison.
 
 ### Search & Ranking Pipeline
 
-1. **Query expansion** — your search query is matched against skill names, descriptions, tags, and categories across all sources. The matching is fuzzy — "web scrape" will match "Web Scraper", "scraping tool", etc.
+1. **Query expansion** �?your search query is matched against skill names, descriptions, tags, and categories across all sources. The matching is fuzzy �?"web scrape" will match "Web Scraper", "scraping tool", etc.
 
-2. **Relevance scoring** — each result gets a relevance score (0–100) based on how well it matches the query. Exact name matches score highest, followed by description matches, then tag matches.
+2. **Relevance scoring** �?each result gets a relevance score (0�?00) based on how well it matches the query. Exact name matches score highest, followed by description matches, then tag matches.
 
-3. **Cross-source normalization** — results from different sources are normalized into a common schema so you can compare them directly. Claw0x skills include pricing and trust scores; community skills include install commands and source URLs.
+3. **Cross-source normalization** �?results from different sources are normalized into a common schema so you can compare them directly. Claw0x skills include pricing and trust scores; community skills include install commands and source URLs.
 
-4. **Ranking** — results are sorted by relevance score first, then by trust score (for Claw0x skills) or community popularity (for community skills).
+4. **Ranking** �?results are sorted by relevance score first, then by trust score (for Claw0x skills) or community popularity (for community skills).
 
 ### Search vs. Recommend Mode
 
-- **Search** (`action: "search"` or default) — returns all matching skills, ranked by relevance. Good for broad exploration.
-- **Recommend** (`action: "recommend"`) — returns a curated shortlist with the skill most likely to solve your specific task at the top. Good for agents that need to pick one tool and go.
+- **Search** (`action: "search"` or default) �?returns all matching skills, ranked by relevance. Good for broad exploration.
+- **Recommend** (`action: "recommend"`) �?returns a curated shortlist with the skill most likely to solve your specific task at the top. Good for agents that need to pick one tool and go.
 
 ### Why This Matters for Agent Orchestration
 
@@ -63,7 +62,7 @@ This enables agents to compose workflows dynamically without hardcoded tool list
 This is a free skill. Just get an API key:
 
 1. Sign up at [claw0x.com](https://claw0x.com)
-2. Go to Dashboard → API Keys → Create Key
+2. Go to Dashboard �?API Keys �?Create Key
 3. Set it as an environment variable:
 
 ```bash
@@ -78,35 +77,6 @@ No credit card or wallet balance needed.
 - Agent needs to pick the right tool for a subtask
 - User wants to compare Claw0x native skills vs community alternatives
 - User asks to browse skill categories or explore the ecosystem
-
-## API Call — Search
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "skill-scout",
-    "input": {
-      "query": "web scraping"
-    }
-  }'
-```
-
-## API Call — Recommend
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "skill-scout",
-    "input": {
-      "action": "recommend",
-      "query": "extract text from PDF"
-    }
-  }'
-```
 
 ## Input
 
@@ -126,7 +96,7 @@ curl -s -X POST https://claw0x.com/v1/call \
 | `skills[].source` | string | `"claw0x"` or `"community"` |
 | `skills[].install_cmd` | string | Install command (e.g. `npx claw0x add scrape`) |
 | `skills[].pricing` | object | `price_per_call` and `is_free` (Claw0x skills only) |
-| `skills[].trust_score` | number | Trust score 0–100 (Claw0x skills only) |
+| `skills[].trust_score` | number | Trust score 0�?00 (Claw0x skills only) |
 | `skills[].api_call` | string | Example API call (Claw0x skills only) |
 
 ## Output (Categories)
@@ -134,6 +104,12 @@ curl -s -X POST https://claw0x.com/v1/call \
 | Field | Type | Description |
 |-------|------|-------------|
 | `categories` | array | Category names with claw0x_count and community_count |
+
+## Error Codes
+
+- `400` — Invalid input parameters
+- `401` — Invalid or missing API key
+- `500` — Processing failed (not billed)
 
 ## Pricing
 

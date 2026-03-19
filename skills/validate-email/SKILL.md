@@ -5,7 +5,6 @@ description: >
   API. Use when the user asks to validate an email, check if an email is real,
   verify email format, or assess email risk. Returns format validation, domain
   extraction, and a risk score.
-allowed-tools: Bash(curl *)
 metadata:
   requires:
     env:
@@ -81,20 +80,6 @@ No credit card or wallet balance needed.
 - Pre-filtering signups or form submissions for obvious junk
 - Assessing email quality or risk in a data cleaning pipeline
 
-## API Call
-
-```bash
-curl -s -X POST https://claw0x.com/v1/call \
-  -H "Authorization: Bearer $CLAW0X_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "validate-email",
-    "input": {
-      "email": "user@example.com"
-    }
-  }'
-```
-
 ## Input
 
 | Field | Type | Required | Description |
@@ -133,6 +118,12 @@ curl -s -X POST https://claw0x.com/v1/call \
 ```
 
 Format is valid, but risk score is high (80) because `mailinator.com` is a known disposable email provider.
+
+## Error Codes
+
+- `400` — Missing or invalid email input
+- `401` — Invalid or missing API key
+- `500` — Processing failed (not billed)
 
 ## Pricing
 
