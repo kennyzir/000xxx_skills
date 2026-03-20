@@ -1,7 +1,7 @@
 ---
-name: claw0x-tavily-search
+name: Web Search (Tavily)
 description: >
-  Search the web for real-time information via the Claw0x API (powered by Tavily).
+  Search the web for real-time information powered by Tavily.
   Use when the user asks to search the web, find current information, look up recent
   news, research a topic online, or when the agent needs up-to-date data that is
   outside its training cutoff. Returns ranked results with snippets and an AI-generated

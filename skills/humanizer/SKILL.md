@@ -1,10 +1,10 @@
 ---
-name: claw0x-humanizer
+name: AI Text Humanizer
 description: >
-  Remove signs of AI-generated writing from text via the Claw0x API. Use when the
-  user asks to humanize text, make AI writing sound natural, remove AI patterns,
-  rewrite to avoid AI detection, or clean up robotic-sounding content. Based on
-  Wikipedia's 24 "Signs of AI writing" patterns. LLM-powered with regex fallback.
+  Remove signs of AI-generated writing from text. Use when the user asks to humanize 
+  text, make AI writing sound natural, remove AI patterns, rewrite to avoid AI detection, 
+  or clean up robotic-sounding content. Based on Wikipedia's 24 "Signs of AI writing" 
+  patterns. LLM-powered with regex fallback.
 metadata:
   requires:
     env:

@@ -1,7 +1,7 @@
 ---
-name: claw0x-agentmail
+name: AgentMail
 description: >
-  API-first email platform for AI agents via the Claw0x API. Use when the user or
+  API-first email platform for AI agents. Use when the user or
   agent needs to send email, manage mailboxes, read incoming messages, or handle
   email workflows programmatically. Designed for autonomous agent-to-agent and
   agent-to-human email communication.

@@ -1,8 +1,8 @@
 ---
-name: claw0x-self-improving-agent
+name: Self-Improving Agent
 description: >
   Capture learnings, errors, corrections, and patterns for continuous agent
-  improvement via the Claw0x API. Use when a command fails unexpectedly, a user
+  improvement. Use when a command fails unexpectedly, a user
   corrects agent output, a new pattern is discovered, or the agent needs to log
   and process improvement events. Returns structured insights, suggested rules,
   and batch summaries. Supports single events and batch processing.

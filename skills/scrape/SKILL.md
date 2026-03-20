@@ -1,7 +1,7 @@
 ---
-name: claw0x-scrape
+name: Web Scraper
 description: >
-  Scrape and extract structured data from any webpage via the Claw0x API.
+  Scrape and extract structured data from any webpage.
   Use when the user asks to scrape a website, extract page content, get headings
   and links from a URL, or pull structured data from a web page. Returns title,
   headings, links, images, and paragraph text. Server-side — no browser needed.

@@ -1,8 +1,8 @@
 ---
-name: claw0x-skill-scout
+name: Skill Scout
 description: >
   Discover, evaluate, and recommend agent skills from the Claw0x catalog and
-  community sources via the Claw0x API. Use when the user asks to find the best
+  community sources. Use when the user asks to find the best
   skill for a task, compare skills, get skill recommendations, browse available
   agent tools, or search across Claw0x native skills and community contributions
   from ClawHub, Anthropic, and VoltAgent. Returns ranked results with pricing,

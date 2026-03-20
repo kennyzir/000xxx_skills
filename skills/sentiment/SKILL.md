@@ -1,7 +1,7 @@
 ---
-name: claw0x-sentiment
+name: Sentiment Analysis
 description: >
-  Analyze the sentiment of text via the Claw0x API. Use when the user asks to
+  Analyze the sentiment of text. Use when the user asks to
   analyze sentiment, detect emotion or mood in text, check if text is positive
   or negative, or score the tone of a message. Returns sentiment label, score,
   confidence, and word-level breakdown. No LLM needed — deterministic analysis.

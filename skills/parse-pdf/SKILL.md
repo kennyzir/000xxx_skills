@@ -1,7 +1,7 @@
 ---
-name: claw0x-parse-pdf
+name: PDF Parser
 description: >
-  Extract text, metadata, and page structure from PDF files via the Claw0x API.
+  Extract text, metadata, and page structure from PDF files.
   Use when the user asks to parse a PDF, extract text from a document, get page
   count, read a PDF by URL, or analyze PDF metadata. Handles files up to 10MB.
   Server-side processing — no local dependencies required.

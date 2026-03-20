@@ -1,8 +1,8 @@
 ---
-name: claw0x-code-gen
+name: Code Generator
 description: >
   Generate production-ready TypeScript serverless function code from a skill
-  description via the Claw0x API. Use when the user asks to generate skill code,
+  description. Use when the user asks to generate skill code,
   create a new API handler, scaffold a serverless function, or auto-generate
   backend code from a README or description. Powered by Gemini LLM.
 metadata:

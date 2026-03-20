@@ -1,7 +1,7 @@
 ---
-name: claw0x-capability-evolver
+name: Capability Evolver
 description: >
-  Meta-skill for AI agent self-improvement via the Claw0x API. Analyzes runtime
+  Meta-skill for AI agent self-improvement. Analyzes runtime
   logs to detect error patterns, regressions, and inefficiencies, then generates
   structured improvement proposals. Use when the user or agent asks to analyze
   logs, diagnose failures, improve agent reliability, generate evolution proposals,

@@ -1,5 +1,5 @@
 ---
-name: claw0x-security-scanner
+name: Security Scanner
 description: >
   Scan AI agent skills for security vulnerabilities, dangerous code patterns,
   and undeclared permissions. Three-layer analysis: dependency CVE scanning via
