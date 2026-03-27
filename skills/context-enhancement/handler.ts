@@ -1,4 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
+import { authMiddleware } from '../../lib/auth';
 
 // Types
 interface Pattern {
