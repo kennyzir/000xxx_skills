@@ -52,7 +52,7 @@ output_schema:
 
 **Cloud skill by [Claw0x](https://claw0x.com)** — powered by Claw0x Gateway API.
 
-> **Requires Claw0x API key.** Sign up at [claw0x.com](https://claw0x.com) to get your key.
+> **Requires Claw0x API key for authentication.** Free to use, no usage charges.
 
 ## What It Does
 
