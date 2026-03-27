@@ -21,6 +21,7 @@ import awesomeOpenclawSkills from '../skills/awesome-openclaw-skills/handler';
 import browserOperator from '../skills/browser-operator/handler';
 import capabilityEvolver from '../skills/capability-evolver/handler';
 import codeGen from '../skills/code-gen/handler';
+import contextEnhancement from '../skills/context-enhancement/handler';
 import humanizer from '../skills/humanizer/handler';
 import parsePdf from '../skills/parse-pdf/handler';
 import scrape from '../skills/scrape/handler';
@@ -41,6 +42,7 @@ const SKILL_MAP: Record<string, Handler> = {
   'browser-operator': browserOperator,
   'capability-evolver': capabilityEvolver,
   'code-gen': codeGen,
+  'context-enhancement': contextEnhancement,
   'humanizer': humanizer,
   'parse-pdf': parsePdf,
   'scrape': scrape,
