@@ -50,9 +50,9 @@ output_schema:
 
 # btw Command
 
-**Local skill by [Claw0x](https://claw0x.com)** — runs entirely in your OpenClaw agent.
+**Cloud skill by [Claw0x](https://claw0x.com)** — powered by Claw0x Gateway API.
 
-> **Runs locally.** No external API calls, no API key required. Complete privacy.
+> **Requires Claw0x API key.** Sign up at [claw0x.com](https://claw0x.com) to get your key.
 
 ## What It Does
 
@@ -71,12 +71,15 @@ Think of it as "by the way, I need to know..." — the agent continues working w
 
 ## 5-Minute Quickstart
 
-### Step 1: Install (30 seconds)
+### Step 1: Get API Key (30 seconds)
+Sign up at [claw0x.com](https://claw0x.com) → Dashboard → Create API Key
+
+### Step 2: Set Environment Variable (30 seconds)
 ```bash
-openclaw skill add btw
+export CLAW0X_API_KEY="ck_live_..."
 ```
 
-### Step 2: Ask Your First Question (1 minute)
+### Step 3: Ask Your First Question (1 minute)
 ```typescript
 const result = await agent.run('btw', {
   question: 'Deploy to staging or production?',
@@ -89,7 +92,7 @@ const result = await agent.run('btw', {
 console.log(result.answer); // 'production' or 'staging' (default)
 ```
 
-### Step 3: Handle the Answer (instant)
+### Step 4: Handle the Answer (instant)
 ```typescript
 if (result.timed_out) {
   console.log(`Used default: ${result.answer}`);
@@ -180,9 +183,13 @@ const { answer } = await btw({
 
 ### OpenClaw Agent
 ```typescript
+import { Claw0xClient } from '@claw0x/sdk';
+
+const claw0x = new Claw0xClient(process.env.CLAW0X_API_KEY);
+
 agent.onTask(async (task) => {
   // Ask question without blocking
-  const { answer } = await agent.run('btw', {
+  const { answer } = await claw0x.call('btw', {
     question: 'Approve this change?',
     options: ['yes', 'no'],
     default: 'no',
@@ -197,9 +204,12 @@ agent.onTask(async (task) => {
 
 ### LangChain Agent
 ```python
+from claw0x import Claw0xClient
+
+claw0x = Claw0xClient(api_key=os.getenv('CLAW0X_API_KEY'))
+
 def ask_user(question, options, default, timeout=300):
-    # Use btw skill locally
-    result = agent.run('btw', {
+    result = claw0x.call('btw', {
         'question': question,
         'options': options,
         'default': default,
@@ -218,16 +228,28 @@ answer = ask_user(
 
 ### Custom Agent
 ```javascript
-// Local btw implementation
+const fetch = require('node-fetch');
+
 async function askBtw(question, options, defaultAnswer) {
-  const result = await agent.run('btw', {
-    question,
-    options,
-    default: defaultAnswer,
-    timeout: 300
+  const response = await fetch('https://api.claw0x.com/v1/call', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.CLAW0X_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      skill: 'btw',
+      input: {
+        question,
+        options,
+        default: defaultAnswer,
+        timeout: 300
+      }
+    })
   });
   
-  return result.answer;
+  const data = await response.json();
+  return data.answer;
 }
 ```
 
@@ -249,16 +271,23 @@ Agent Workflow
 
 ## Why Use Via Claw0x?
 
-- **Zero configuration**: No API keys, no setup
-- **Complete privacy**: Runs entirely locally
-- **Offline capable**: Works without internet
-- **Unlimited usage**: No rate limits or quotas
-- **Open source**: Transparent implementation
-- **Agent-native**: Built for autonomous workflows
+- **Unified billing**: One API key for all skills
+- **Atomic pricing**: Pay per question, not per month (FREE for btw)
+- **Zero cost on failure**: Failed calls don't charge
+- **Production-ready**: 99.9% uptime, <100ms latency
+- **Security scanned**: OSV.dev integration
+- **Multi-channel notifications**: Web, mobile, Slack, webhooks
+- **Persistent queue**: Questions survive server restarts
 
 ## Prerequisites
 
-**None.** Just install and use.
+1. **Sign up at [claw0x.com](https://claw0x.com)**
+2. **Create API key** in Dashboard
+3. **Set environment variable**:
+   ```bash
+   # Add to your environment
+   export CLAW0X_API_KEY="ck_live_..."
+   ```
 
 ## Input Parameters
 
@@ -285,20 +314,24 @@ Agent Workflow
 | Code | Meaning | Solution |
 |------|---------|----------|
 | 400 | Invalid input | Check question is non-empty |
-| 500 | Internal error | Retry or check logs |
+| 401 | Missing or invalid API key | Set CLAW0X_API_KEY |
+| 429 | Rate limit exceeded | Wait or upgrade plan |
+| 500 | Internal error (not billed) | Retry or contact support |
 
 ## Pricing
 
-**Free.** No API key required, no usage limits.
+**FREE.** No charge per question.
 
-- Runs entirely locally in your agent
-- No external API calls
-- Complete privacy
+- Requires Claw0x API key for authentication
+- No usage charges (price_per_call = 0)
 - Unlimited questions
+- Pay only for infrastructure (covered by Claw0x)
 
 ## Rate Limits
 
-**None.** Unlimited questions.
+- **Requests per minute**: 60
+- **Requests per day**: 5000
+- **Free tier daily**: 50 questions
 
 ## About Claw0x
 
