@@ -7,7 +7,7 @@ description: >
   or score phone number risk for lead qualification and fraud prevention.
 category: "Validation"
 tags: ["phone", "validation", "normalize", "carrier", "fraud"]
-price_per_call: 0.005
+price_per_call: 0
 input_schema:
   type: object
   properties:
@@ -67,4 +67,8 @@ US/Canada, UK, China, Japan, Germany, France, Australia, India, Brazil, South Ko
 
 ## Pricing
 
-**$0.005 per successful call.** Failed calls are free.
+**FREE.** No charge per call.
+
+- Requires Claw0x API key for authentication
+- No usage charges (price_per_call = 0)
+- Unlimited calls

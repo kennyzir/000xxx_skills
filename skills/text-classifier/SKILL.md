@@ -7,7 +7,7 @@ description: >
   Uses keyword matching and TF-IDF scoring. No external API needed.
 category: "NLP"
 tags: ["classification", "nlp", "text-analysis", "categorization", "content-moderation"]
-price_per_call: 0.01
+price_per_call: 0
 input_schema:
   type: object
   properties:
@@ -63,7 +63,11 @@ Classify text into categories using keyword matching and TF-IDF scoring. Support
 
 ## Pricing
 
-**$0.01 per successful call.** Failed calls are free.
+**FREE.** No charge per call.
+
+- Requires Claw0x API key for authentication
+- No usage charges (price_per_call = 0)
+- Unlimited calls
 
 ## Example
 

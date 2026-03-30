@@ -7,7 +7,7 @@ description: >
   or access control. Handles IPv4 and IPv6, detects private/reserved ranges.
 category: "Data Enrichment"
 tags: ["ip", "geolocation", "geo", "fraud-detection", "analytics", "security"]
-price_per_call: 0.002
+price_per_call: 0
 input_schema:
   type: object
   properties:
@@ -67,7 +67,11 @@ Look up geographic and network information for any IP address. Returns country, 
 
 ## Pricing
 
-**$0.002 per successful call.** Failed calls are free.
+**FREE.** No charge per call.
+
+- Requires Claw0x API key for authentication
+- No usage charges (price_per_call = 0)
+- Unlimited calls
 
 ## Example
 

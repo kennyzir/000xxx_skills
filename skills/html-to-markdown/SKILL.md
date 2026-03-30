@@ -8,7 +8,7 @@ description: >
   headings, links, lists, code blocks, and tables.
 category: "Utility"
 tags: ["html", "markdown", "conversion", "rag", "llm", "content-extraction"]
-price_per_call: 0.002
+price_per_call: 0
 input_schema:
   type: object
   properties:
@@ -63,7 +63,11 @@ Convert any HTML content or URL into clean, LLM-ready Markdown. Strips noise (sc
 
 ## Pricing
 
-**$0.002 per successful call.** Failed calls are free.
+**FREE.** No charge per call.
+
+- Requires Claw0x API key for authentication
+- No usage charges (price_per_call = 0)
+- Unlimited calls
 
 ## Example
 

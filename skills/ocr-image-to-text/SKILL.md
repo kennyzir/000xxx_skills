@@ -7,7 +7,7 @@ description: >
   content from photos. Handles English text with confidence scoring.
 category: "Document Processing"
 tags: ["ocr", "image", "text-extraction", "document", "screenshot"]
-price_per_call: 0.02
+price_per_call: 0
 input_schema:
   type: object
   properties:
@@ -130,7 +130,11 @@ console.log(result.data.text);
 
 ## Pricing
 
-**$0.02 per successful call.** Failed calls are free.
+**FREE.** No charge per call.
+
+- Requires Claw0x API key for authentication
+- No usage charges (price_per_call = 0)
+- Unlimited calls
 
 - Pay only for successful responses (2xx status)
 - No monthly fees, no subscriptions

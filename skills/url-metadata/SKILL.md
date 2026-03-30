@@ -7,7 +7,7 @@ description: >
   metadata, or extract SEO information from URLs.
 category: "Utilities"
 tags: ["url", "metadata", "opengraph", "seo", "link-preview"]
-price_per_call: 0.002
+price_per_call: 0
 input_schema:
   type: object
   properties:
@@ -65,4 +65,8 @@ title, description, og_title, og_description, og_image, og_type, og_site_name, t
 
 ## Pricing
 
-**$0.002 per successful call.** Failed calls are free.
+**FREE.** No charge per call.
+
+- Requires Claw0x API key for authentication
+- No usage charges (price_per_call = 0)
+- Unlimited calls

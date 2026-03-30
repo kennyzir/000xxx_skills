@@ -7,7 +7,7 @@ description: >
   topics. Returns ranked single words and multi-word phrases with frequency counts.
 category: "NLP"
 tags: ["keywords", "nlp", "seo", "tf-idf", "content-tagging", "text-analysis"]
-price_per_call: 0.005
+price_per_call: 0
 input_schema:
   type: object
   properties:
@@ -64,7 +64,11 @@ Extract the most important keywords and keyphrases from any text. Uses TF-IDF sc
 
 ## Pricing
 
-**$0.005 per successful call.** Failed calls are free.
+**FREE.** No charge per call.
+
+- Requires Claw0x API key for authentication
+- No usage charges (price_per_call = 0)
+- Unlimited calls
 
 ## Example
 

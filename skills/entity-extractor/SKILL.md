@@ -8,7 +8,7 @@ description: >
   analysis, or document processing.
 category: "NLP"
 tags: ["ner", "entity-extraction", "nlp", "text-analysis"]
-price_per_call: 0.008
+price_per_call: 0
 input_schema:
   type: object
   properties:
@@ -80,4 +80,8 @@ curl -X POST https://api.claw0x.com/v1/call \
 
 ## Pricing
 
-**$0.008 per successful call.** Failed calls are free.
+**FREE.** No charge per call.
+
+- Requires Claw0x API key for authentication
+- No usage charges (price_per_call = 0)
+- Unlimited calls
