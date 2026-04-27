@@ -1,338 +1,398 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import axios from 'axios';
 import { authMiddleware } from '../../lib/auth';
 import { validateInput } from '../../lib/validation';
 import { successResponse, errorResponse } from '../../lib/response';
 
-const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
+/**
+ * youtube-intel — Pure Logic Skill
+ * YouTube content intelligence and competitive monitoring.
+ *
+ * Two modes:
+ *   - monitoring: Track specific channels, compare with history
+ *   - discovery: Scan market categories for content opportunities (6-step workflow)
+ *
+ * Type: Pure logic processing (no external paid API dependencies)
+ * Source: https://github.com/kennyzir/Claw0X_skills
+ */
 
-// --- Types ---
+// ─── Types ───────────────────────────────────────────────────
 
-interface VideoResult {
+type Mode = 'monitoring' | 'discovery';
+type ContentType = 'review' | 'tutorial' | 'list' | 'comparison' | 'news' | 'opinion' | 'other';
+type CompetitionLevel = 'red' | 'yellow' | 'green' | 'blank';
+
+interface VideoRecord {
   title: string;
+  video_id: string;
   url: string;
-  channel: string;
-  snippet: string;
-  content_type: 'review' | 'tutorial' | 'list' | 'comparison' | 'news' | 'other';
+  channel_name: string;
+  channel_handle: string;
+  views: number;
+  views_display: string;
+  published_days_ago: number;
+  published_display: string;
+  duration: string;
   is_short: boolean;
+  sub_category?: string;
+  content_type?: ContentType;
+  is_viral: boolean;
+  is_emerging: boolean;
 }
 
 interface ChannelProfile {
   name: string;
-  video_count: number;
-  content_types: Record<string, number>;
+  handle: string;
+  videos_in_results: number;
+  avg_views: number;
+  max_views: number;
+  latest_video_days_ago: number;
+  content_type_distribution: Record<string, number>;
   is_established: boolean;
+  is_emerging: boolean;
 }
 
-interface SubCategoryAnalysis {
-  name: string;
-  search_query: string;
-  videos: VideoResult[];
-  channels: ChannelProfile[];
-  competition: {
-    total_videos: number;
-    unique_channels: number;
-    established_channels: number;
-    level: 'low' | 'medium' | 'high' | 'blank';
-    emoji: string;
+interface CompetitionAssessment {
+  sub_category: string;
+  total_videos: number;
+  unique_channels: number;
+  avg_views: number;
+  top_video_views: number;
+  established_channels: number;
+  competition_level: CompetitionLevel;
+  top3_traffic_share: number;
+}
+
+interface Opportunity {
+  type: 'differentiation' | 'niche' | 'format' | 'timing' | 'data';
+  sub_category: string;
+  description: string;
+  evidence: string[];
+  suggested_angle: string;
+  risk: string;
+  priority: number;
+}
+
+interface DiscoveryInput {
+  mode: 'discovery';
+  query: string;
+  options?: {
+    subcategories?: string[];
+    max_results?: number;
   };
-  opportunities: Array<{
-    type: string;
-    description: string;
-    suggested_angle: string;
-  }>;
 }
 
-// --- Content Type Classification ---
-
-function classifyContentType(title: string): VideoResult['content_type'] {
-  const t = title.toLowerCase();
-  if (/\b(review|honest|worth\s+it|pros?\s+and\s+cons?)\b/.test(t)) return 'review';
-  if (/\b(tutorial|how\s+to|step\s+by\s+step|guide|learn)\b/.test(t)) return 'tutorial';
-  if (/\b(top\s+\d|best\s+\d|\d+\s+best|\d+\s+ways|\d+\s+tips)\b/.test(t)) return 'list';
-  if (/\b(vs|versus|compared?|comparison|alternative)\b/.test(t)) return 'comparison';
-  if (/\b(new|update|launch|announce|breaking|just\s+released)\b/.test(t)) return 'news';
-  return 'other';
-}
-
-// --- Sub-Category Expansion ---
-
-function expandCategory(category: string): string[] {
-  const c = category.toLowerCase().trim();
-
-  // Common category expansions
-  const expansions: Record<string, string[]> = {
-    'ai': ['AI image tools', 'AI coding tools', 'AI writing tools', 'AI video tools', 'AI voice tools', 'AI productivity tools'],
-    'ai tools': ['AI image generator', 'AI code assistant', 'AI writing assistant', 'AI video editor', 'AI voice cloning'],
-    'content creation': ['YouTube editing tools', 'thumbnail design', 'script writing', 'video SEO', 'content repurposing'],
-    'gaming': ['game reviews', 'gaming setup', 'game tutorials', 'esports', 'indie games'],
-    'programming': ['web development', 'mobile development', 'AI/ML development', 'DevOps tools', 'coding tutorials'],
+interface MonitoringInput {
+  mode: 'monitoring';
+  query: string;
+  options?: {
+    history?: VideoRecord[];
   };
-
-  // Check for exact or partial match
-  for (const [key, subs] of Object.entries(expansions)) {
-    if (c === key || c.includes(key)) return subs;
-  }
-
-  // Default: generate generic sub-categories
-  return [
-    `${category} tutorial`,
-    `${category} review`,
-    `best ${category}`,
-    `${category} tips`,
-    `${category} for beginners`,
-  ];
 }
 
-// --- YouTube Search via Tavily ---
+type SkillInput = DiscoveryInput | MonitoringInput;
 
-async function searchYouTube(query: string): Promise<VideoResult[]> {
-  if (!TAVILY_API_KEY) return [];
+// ─── Helpers ─────────────────────────────────────────────────
 
-  try {
-    const response = await axios.post('https://api.tavily.com/search', {
-      api_key: TAVILY_API_KEY,
-      query: `${query} site:youtube.com`,
-      search_depth: 'basic',
-      max_results: 10,
-      include_answer: false,
-    }, { timeout: 15000 });
-
-    return (response.data.results || [])
-      .filter((r: any) => r.url && r.url.includes('youtube.com'))
-      .map((r: any) => {
-        const title = r.title || '';
-        // Try to extract channel from title pattern "Title - Channel"
-        const parts = title.split(' - ');
-        const channel = parts.length > 1 ? parts[parts.length - 1].trim() : 'Unknown';
-        const videoTitle = parts.length > 1 ? parts.slice(0, -1).join(' - ').trim() : title;
-
-        return {
-          title: videoTitle,
-          url: r.url,
-          channel,
-          snippet: (r.content || '').slice(0, 200),
-          content_type: classifyContentType(videoTitle),
-          is_short: r.url.includes('/shorts/'),
-        };
-      });
-  } catch {
-    return [];
-  }
+function parseViews(text: string): number {
+  if (!text) return 0;
+  const cleaned = text.replace(/,/g, '').trim();
+  const mMatch = cleaned.match(/([\d.]+)\s*[Mm]/);
+  if (mMatch) return Math.round(parseFloat(mMatch[1]) * 1_000_000);
+  const kMatch = cleaned.match(/([\d.]+)\s*[Kk]/);
+  if (kMatch) return Math.round(parseFloat(kMatch[1]) * 1_000);
+  const wanMatch = cleaned.match(/([\d.]+)\s*万/);
+  if (wanMatch) return Math.round(parseFloat(wanMatch[1]) * 10_000);
+  const numMatch = cleaned.match(/(\d+)/);
+  return numMatch ? parseInt(numMatch[1], 10) : 0;
 }
 
-// --- Channel Aggregation ---
+function parsePublishedDays(text: string): number {
+  if (!text) return 0;
+  const hourMatch = text.match(/(\d+)\s*(hour|小时)/i);
+  if (hourMatch) return Math.round(parseInt(hourMatch[1], 10) / 24);
+  const dayMatch = text.match(/(\d+)\s*(day|天)/i);
+  if (dayMatch) return parseInt(dayMatch[1], 10);
+  const weekMatch = text.match(/(\d+)\s*(week|周)/i);
+  if (weekMatch) return parseInt(weekMatch[1], 10) * 7;
+  const monthMatch = text.match(/(\d+)\s*(month|个月)/i);
+  if (monthMatch) return parseInt(monthMatch[1], 10) * 30;
+  const yearMatch = text.match(/(\d+)\s*(year|年)/i);
+  if (yearMatch) return parseInt(yearMatch[1], 10) * 365;
+  return 0;
+}
 
-function aggregateChannels(videos: VideoResult[]): ChannelProfile[] {
-  const channelMap = new Map<string, { videos: VideoResult[] }>();
+function decomposeCategory(query: string): string[] {
+  const broad: Record<string, string[]> = {
+    'ai': ['AI image tools', 'AI coding tools', 'AI writing tools', 'AI video tools', 'AI audio tools', 'AI productivity tools'],
+    'ai tools': ['AI image generation', 'AI coding assistants', 'AI writing tools', 'AI video generation', 'AI audio tools'],
+    'content creation': ['YouTube growth', 'video editing', 'thumbnail design', 'scriptwriting', 'content strategy'],
+    'ecommerce': ['dropshipping', 'Amazon FBA', 'Shopify stores', 'print on demand', 'digital products'],
+    'productivity': ['note-taking apps', 'project management', 'automation tools', 'time management', 'AI productivity'],
+  };
+  const lower = query.toLowerCase().trim();
+  return broad[lower] || [query];
+}
 
+function aggregateChannels(videos: VideoRecord[]): ChannelProfile[] {
+  const map: Record<string, { videos: VideoRecord[]; views: number[] }> = {};
   for (const v of videos) {
-    const existing = channelMap.get(v.channel) || { videos: [] };
-    existing.videos.push(v);
-    channelMap.set(v.channel, existing);
+    const key = v.channel_handle || v.channel_name;
+    if (!map[key]) map[key] = { videos: [], views: [] };
+    map[key].videos.push(v);
+    map[key].views.push(v.views);
   }
-
-  return Array.from(channelMap.entries()).map(([name, data]) => {
-    const contentTypes: Record<string, number> = {};
+  return Object.entries(map).map(([handle, data]) => {
+    const avg = data.views.reduce((a, b) => a + b, 0) / data.views.length;
+    const max = Math.max(...data.views);
+    const latest = Math.min(...data.videos.map(v => v.published_days_ago));
+    const typeDist: Record<string, number> = {};
     for (const v of data.videos) {
-      contentTypes[v.content_type] = (contentTypes[v.content_type] || 0) + 1;
+      const ct = v.content_type || 'other';
+      typeDist[ct] = (typeDist[ct] || 0) + 1;
     }
-
     return {
-      name,
-      video_count: data.videos.length,
-      content_types: contentTypes,
-      is_established: data.videos.length >= 3,
+      name: data.videos[0].channel_name,
+      handle,
+      videos_in_results: data.videos.length,
+      avg_views: Math.round(avg),
+      max_views: max,
+      latest_video_days_ago: latest,
+      content_type_distribution: typeDist,
+      is_established: data.videos.length >= 3 && avg > 200_000,
+      is_emerging: data.videos.length <= 2 && max > 500_000,
     };
-  }).sort((a, b) => b.video_count - a.video_count);
+  });
 }
 
-// --- Competition Assessment ---
-
-function assessCompetition(videos: VideoResult[], channels: ChannelProfile[]): SubCategoryAnalysis['competition'] {
+function assessCompetition(videos: VideoRecord[], channels: ChannelProfile[], subCategory: string): CompetitionAssessment {
+  const views = videos.map(v => v.views).sort((a, b) => b - a);
+  const totalViews = views.reduce((a, b) => a + b, 0);
+  const avg = totalViews / (views.length || 1);
+  const top = views[0] || 0;
+  const top3 = views.slice(0, 3).reduce((a, b) => a + b, 0);
   const established = channels.filter(c => c.is_established).length;
 
-  let level: 'low' | 'medium' | 'high' | 'blank';
-  if (videos.length < 3) {
-    level = 'blank';
-  } else if (established >= 5) {
-    level = 'high';
-  } else if (established >= 2) {
-    level = 'medium';
-  } else {
-    level = 'low';
-  }
-
-  const emoji = level === 'low' ? '🟢' : level === 'medium' ? '🟡' : level === 'high' ? '🔴' : '⚪';
+  let level: CompetitionLevel = 'blank';
+  if (views.length < 5) level = 'blank';
+  else if (top > 1_000_000 && established > 5) level = 'red';
+  else if (top > 300_000 || established >= 2) level = 'yellow';
+  else level = 'green';
 
   return {
+    sub_category: subCategory,
     total_videos: videos.length,
     unique_channels: channels.length,
+    avg_views: Math.round(avg),
+    top_video_views: top,
     established_channels: established,
-    level,
-    emoji,
+    competition_level: level,
+    top3_traffic_share: totalViews > 0 ? Math.round((top3 / totalViews) * 100) : 0,
   };
 }
 
-// --- Opportunity Identification ---
+function findOpportunities(videos: VideoRecord[], channels: ChannelProfile[], competition: CompetitionAssessment): Opportunity[] {
+  const opps: Opportunity[] = [];
+  const subCat = competition.sub_category;
 
-function identifyOpportunities(videos: VideoResult[], channels: ChannelProfile[], competition: SubCategoryAnalysis['competition']): SubCategoryAnalysis['opportunities'] {
-  const opportunities: SubCategoryAnalysis['opportunities'] = [];
-  const contentTypes = videos.reduce((acc, v) => {
-    acc[v.content_type] = (acc[v.content_type] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  // Format gap
-  const allTypes = ['review', 'tutorial', 'list', 'comparison'];
-  const missingTypes = allTypes.filter(t => !contentTypes[t] || contentTypes[t] < 2);
-  if (missingTypes.length > 0) {
-    opportunities.push({
-      type: 'format_gap',
-      description: `Missing content formats: ${missingTypes.join(', ')}`,
-      suggested_angle: `Create ${missingTypes[0]} content — low competition in this format.`,
+  // Format opportunity: check if tutorials are scarce
+  const typeCounts: Record<string, number> = {};
+  for (const v of videos) {
+    const ct = v.content_type || 'other';
+    typeCounts[ct] = (typeCounts[ct] || 0) + 1;
+  }
+  if ((typeCounts['tutorial'] || 0) < 3 && videos.length > 5) {
+    opps.push({
+      type: 'format',
+      sub_category: subCat,
+      description: 'Tutorial content is scarce in this subcategory',
+      evidence: [`Only ${typeCounts['tutorial'] || 0} tutorial videos found out of ${videos.length}`],
+      suggested_angle: 'Step-by-step tutorial or beginner guide',
+      risk: 'May require more production effort',
+      priority: 2,
     });
   }
 
-  // Blank market
-  if (competition.level === 'blank') {
-    opportunities.push({
-      type: 'blank_market',
-      description: 'Very few videos in this sub-category. Early mover advantage.',
-      suggested_angle: 'Be the first comprehensive resource. Establish authority early.',
+  // Timing opportunity: recent emerging videos
+  const emerging = videos.filter(v => v.is_emerging);
+  if (emerging.length >= 3) {
+    opps.push({
+      type: 'timing',
+      sub_category: subCat,
+      description: `Market is heating up — ${emerging.length} new videos in last 30 days`,
+      evidence: emerging.slice(0, 3).map(v => `"${v.title}" (${v.views} views, ${v.published_days_ago}d ago)`),
+      suggested_angle: 'Ride the wave with timely content',
+      risk: 'Window may close quickly',
+      priority: 1,
     });
   }
 
-  // Low competition
-  if (competition.level === 'low') {
-    opportunities.push({
-      type: 'low_competition',
-      description: 'Few established channels. Room for new entrants.',
-      suggested_angle: 'Consistent publishing (2-3 videos/week) can build authority quickly.',
+  // Niche opportunity: low competition
+  if (competition.competition_level === 'green') {
+    opps.push({
+      type: 'niche',
+      sub_category: subCat,
+      description: 'Low competition — opportunity to establish early presence',
+      evidence: [`Top video only ${competition.top_video_views} views`, `${competition.established_channels} established channels`],
+      suggested_angle: 'Comprehensive coverage to become the go-to channel',
+      risk: 'Low competition may also mean low demand — validate first',
+      priority: 1,
     });
   }
 
-  // Tutorial gap
-  if (!contentTypes['tutorial'] || contentTypes['tutorial'] < 2) {
-    opportunities.push({
-      type: 'tutorial_gap',
-      description: 'Few tutorial/how-to videos. High search intent for learning content.',
-      suggested_angle: 'Create step-by-step tutorials with screen recordings.',
+  // Differentiation opportunity: high competition but gaps exist
+  if (competition.competition_level === 'red' && (typeCounts['comparison'] || 0) < 2) {
+    opps.push({
+      type: 'differentiation',
+      sub_category: subCat,
+      description: 'High competition but comparison/data-driven content is rare',
+      evidence: [`Only ${typeCounts['comparison'] || 0} comparison videos`, `${competition.established_channels} established channels dominate`],
+      suggested_angle: 'Data-driven comparison or unique vertical angle',
+      risk: 'Requires strong differentiation to break through',
+      priority: 3,
     });
   }
 
-  return opportunities;
+  return opps.sort((a, b) => a.priority - b.priority);
 }
 
-// --- Main Handler ---
+function extractViralPatterns(videos: VideoRecord[]) {
+  return videos
+    .filter(v => v.is_viral)
+    .slice(0, 5)
+    .map(v => {
+      const title = v.title;
+      const hasNumber = /\d/.test(title);
+      const hasStrongWord = /best|top|vs|review|free|worst|honest|truth/i.test(title);
+      const hasYear = /202[4-9]/.test(title);
+      return {
+        video_id: v.video_id,
+        title: v.title,
+        views: v.views,
+        published_days_ago: v.published_days_ago,
+        channel: v.channel_name,
+        title_features: { hasNumber, hasStrongWord, hasYear, length: title.length },
+        lessons: [
+          hasNumber ? 'Uses numbers in title (listicle format)' : null,
+          hasStrongWord ? 'Uses strong/emotional words' : null,
+          hasYear ? 'Includes current year (evergreen SEO)' : null,
+          title.length < 60 ? 'Concise title (under 60 chars)' : 'Long title — may get truncated',
+        ].filter(Boolean),
+      };
+    });
+}
+
+// ─── Main Handler ────────────────────────────────────────────
 
 async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') {
+    return errorResponse(res, 'Method not allowed', 405);
+  }
+
+  const startTime = Date.now();
+
   const validation = validateInput(req.body, {
-    category: { type: 'string', required: true, min: 2, max: 200 },
+    mode: { type: 'string', required: true },
+    query: { type: 'string', required: true },
   });
 
   if (!validation.valid) {
     return errorResponse(res, 'Invalid input', 400, validation.errors);
   }
 
-  if (!TAVILY_API_KEY) {
-    return errorResponse(res, 'Search API not configured', 500);
+  const { mode, query, options } = req.body as SkillInput & { options?: any };
+
+  if (mode !== 'monitoring' && mode !== 'discovery') {
+    return errorResponse(res, 'Invalid mode. Use "monitoring" or "discovery"', 400);
   }
 
-  const { category } = validation.data!;
-  const mode = req.body.mode || 'discovery';
-  const maxSubCategories = Math.min(req.body.max_sub_categories || 5, 8);
+  if (!query || typeof query !== 'string' || query.trim().length === 0) {
+    return errorResponse(res, 'Missing required field: query', 400);
+  }
 
   try {
-    const startTime = Date.now();
-
     if (mode === 'discovery') {
-      // Step 1: Expand category into sub-categories
-      const subCategories = expandCategory(category).slice(0, maxSubCategories);
+      // Discovery mode: decompose category, build search strategy, analyze
+      const subcategories = options?.subcategories || decomposeCategory(query);
+      const allVideos: VideoRecord[] = options?.videos || [];
+      const results: any[] = [];
 
-      // Step 2-5: Search, clean, analyze each sub-category
-      const analyses: SubCategoryAnalysis[] = [];
+      for (const subCat of subcategories) {
+        // Filter videos for this subcategory (if provided)
+        const subVideos = allVideos.filter(v => v.sub_category === subCat || !v.sub_category);
+        const channels = aggregateChannels(subVideos);
+        const competition = assessCompetition(subVideos, channels, subCat);
+        const opportunities = findOpportunities(subVideos, channels, competition);
+        const viralPatterns = extractViralPatterns(subVideos);
 
-      for (const sub of subCategories) {
-        const videos = await searchYouTube(sub);
-        const channels = aggregateChannels(videos);
-        const competition = assessCompetition(videos, channels);
-        const opportunities = identifyOpportunities(videos, channels, competition);
-
-        analyses.push({
-          name: sub,
-          search_query: `${sub} site:youtube.com`,
-          videos,
-          channels,
+        results.push({
+          sub_category: subCat,
           competition,
+          channels: channels.slice(0, 10),
           opportunities,
+          viral_patterns: viralPatterns,
+          video_count: subVideos.length,
         });
       }
 
-      // Step 6: Rank by opportunity
-      const ranked = analyses.sort((a, b) => {
-        const levelOrder = { blank: 0, low: 1, medium: 2, high: 3 };
-        return levelOrder[a.competition.level] - levelOrder[b.competition.level];
-      });
-
-      // Top opportunities across all sub-categories
-      const topOpportunities = ranked
-        .flatMap(a => a.opportunities.map(o => ({
-          sub_category: a.name,
-          competition: a.competition.emoji,
-          ...o,
-        })))
-        .slice(0, 10);
+      const allOpportunities = results
+        .flatMap(r => r.opportunities)
+        .sort((a, b) => a.priority - b.priority);
 
       return successResponse(res, {
         mode: 'discovery',
-        category,
-        sub_categories_analyzed: ranked.length,
-        analyses: ranked,
-        top_opportunities: topOpportunities,
+        query,
+        subcategories,
+        subcategory_results: results,
+        opportunities: allOpportunities,
         summary: {
-          total_videos: ranked.reduce((s, a) => s + a.videos.length, 0),
-          total_channels: ranked.reduce((s, a) => s + a.channels.length, 0),
-          competition_distribution: {
-            blank: ranked.filter(a => a.competition.level === 'blank').length,
-            low: ranked.filter(a => a.competition.level === 'low').length,
-            medium: ranked.filter(a => a.competition.level === 'medium').length,
-            high: ranked.filter(a => a.competition.level === 'high').length,
-          },
+          total_subcategories: subcategories.length,
+          total_videos_analyzed: allVideos.length,
+          competition_overview: results.map(r => ({
+            sub_category: r.sub_category,
+            level: r.competition.competition_level,
+          })),
+          top_opportunity: allOpportunities[0] || null,
         },
         _meta: {
           skill: 'youtube-intel',
-          latency_ms: Date.now() - startTime,
           mode: 'discovery',
-        },
-      });
-    } else if (mode === 'monitoring') {
-      // Monitoring mode: search for a specific channel/topic
-      const videos = await searchYouTube(category);
-      const channels = aggregateChannels(videos);
-
-      return successResponse(res, {
-        mode: 'monitoring',
-        query: category,
-        videos,
-        channels,
-        total_videos: videos.length,
-        content_type_distribution: videos.reduce((acc, v) => {
-          acc[v.content_type] = (acc[v.content_type] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>),
-        _meta: {
-          skill: 'youtube-intel',
           latency_ms: Date.now() - startTime,
-          mode: 'monitoring',
         },
       });
     } else {
-      return errorResponse(res, 'Invalid mode. Use "discovery" or "monitoring"', 400);
+      // Monitoring mode: analyze channel data
+      const channelHandle = query.startsWith('@') ? query : `@${query}`;
+      const history = options?.history || [];
+      const currentVideos: VideoRecord[] = options?.videos || [];
+      const channels = aggregateChannels(currentVideos);
+      const profile = channels[0] || null;
+
+      // Compare with history
+      const newVideos = currentVideos.filter(
+        v => !history.some((h: VideoRecord) => h.video_id === v.video_id)
+      );
+
+      return successResponse(res, {
+        mode: 'monitoring',
+        channel: channelHandle,
+        profile,
+        new_videos: newVideos,
+        total_current: currentVideos.length,
+        total_history: history.length,
+        changes: {
+          new_video_count: newVideos.length,
+          avg_views_current: profile?.avg_views || 0,
+        },
+        _meta: {
+          skill: 'youtube-intel',
+          mode: 'monitoring',
+          latency_ms: Date.now() - startTime,
+        },
+      });
     }
   } catch (error: any) {
-    console.error('YouTube intel error:', error);
-    return errorResponse(res, 'YouTube intelligence failed', 500, error.message);
+    console.error('youtube-intel error:', error);
+    return errorResponse(res, error.message || 'Internal processing error', 500);
   }
 }
 
